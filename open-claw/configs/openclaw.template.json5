@@ -1,0 +1,133 @@
+// OpenClaw Configuration Template — Open Claw Project
+// Copy to ~/.openclaw/openclaw.json and customize.
+// All secrets must be in ~/.openclaw/.env, NOT in this file.
+{
+  // ─── Gateway ───────────────────────────────────────────────────────
+  gateway: {
+    mode: "local",
+    port: 18789,
+    bind: "loopback",
+    auth: {
+      mode: "token",
+      // Token is read from OPENCLAW_GATEWAY_TOKEN in ~/.openclaw/.env
+      // Generate with: openclaw doctor --generate-gateway-token
+      rateLimit: {
+        maxAttempts: 10,
+        windowMs: 60000,
+        lockoutMs: 300000,
+        exemptLoopback: true,
+      },
+    },
+    controlUi: {
+      enabled: true,
+      basePath: "/openclaw",
+    },
+    tailscale: {
+      mode: "off",
+    },
+  },
+
+  // ─── Agents — 3-tier model routing ─────────────────────────────────
+  agents: {
+    defaults: {
+      workspace: "~/.openclaw/workspace",
+      model: {
+        // Premium tier (default for complex tasks)
+        primary: "anthropic/claude-sonnet-4-5",
+        // Mid tier fallback
+        fallbacks: ["openai/gpt-4o"],
+      },
+      models: {
+        // Premium tier — complex reasoning, coding, analysis
+        "anthropic/claude-sonnet-4-5": { alias: "Sonnet" },
+        "anthropic/claude-opus-4-6": { alias: "Opus" },
+        // Mid tier — balanced cost/performance
+        "openai/gpt-4o": { alias: "GPT-4o" },
+        "anthropic/claude-haiku-4-5": { alias: "Haiku" },
+        // Budget tier — routine tasks, summaries
+        "openai/gpt-4o-mini": { alias: "Mini" },
+      },
+      // BLOCKED: Configure cost caps once API keys are active
+      // limits: {
+      //   maxTokensPerTurn: 100000,
+      //   maxTurnsPerSession: 50,
+      //   maxDailyTokens: 1000000,
+      // },
+      sandbox: {
+        mode: "non-main",
+        scope: "session",
+        workspaceAccess: "none",
+      },
+    },
+  },
+
+  // ─── Channels — all built-in channels DISABLED ─────────────────────
+  // Official APIs only; Baileys (WhatsApp unofficial) is OFF.
+  channels: {
+    whatsapp: {
+      enabled: false,  // Baileys disabled — use whatsapp-official skill instead
+    },
+    telegram: {
+      enabled: false,  // Enable when TELEGRAM_BOT_TOKEN is in ~/.openclaw/.env
+      dmPolicy: "pairing",
+    },
+    discord: {
+      enabled: false,  // Enable when DISCORD_BOT_TOKEN is in ~/.openclaw/.env
+    },
+    slack: {
+      enabled: false,  // Enable when SLACK_BOT_TOKEN + SLACK_APP_TOKEN are in ~/.openclaw/.env
+    },
+  },
+
+  // ─── Session ───────────────────────────────────────────────────────
+  session: {
+    dmScope: "per-channel-peer",
+    reset: {
+      mode: "daily",
+      atHour: 4,
+      idleMinutes: 120,
+    },
+    maintenance: {
+      mode: "warn",
+      pruneAfter: "30d",
+      maxEntries: 500,
+    },
+  },
+
+  // ─── Tools ─────────────────────────────────────────────────────────
+  tools: {
+    profile: "coding",
+    allow: ["group:fs", "browser"],
+    deny: [],
+  },
+
+  // ─── Skills ────────────────────────────────────────────────────────
+  skills: {
+    load: {
+      extraDirs: [],
+      watch: true,
+      watchDebounceMs: 250,
+    },
+    entries: {
+      "approval-gate": { enabled: false },
+      "gmail-inbox": { enabled: false },
+      "domain-email": { enabled: false },
+      "sms-twilio": { enabled: false },
+      "whatsapp-official": { enabled: false },
+      "google-calendar": { enabled: false },
+      "google-contacts": { enabled: false },
+      "mem0-bridge": { enabled: false },
+    },
+  },
+
+  // ─── Cron ──────────────────────────────────────────────────────────
+  cron: {
+    enabled: true,
+    maxConcurrentRuns: 2,
+    sessionRetention: "24h",
+  },
+
+  // ─── Audit ─────────────────────────────────────────────────────────
+  // Audit is always enabled by default. No additional config needed.
+  // Security findings are collected by `openclaw doctor`.
+}

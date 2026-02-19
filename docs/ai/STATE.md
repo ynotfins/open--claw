@@ -152,6 +152,149 @@ Bootstrapped; nothing executed yet.
 ### What's next
 - Phase 1: Development Environment & Gateway Boot (awaiting PLAN tab prompt)
 
+---
+
+## 2026-02-18 — Phase 1A, STEP 1: Environment
+
+### Changes
+- Installed nvm 0.40.1 in WSL
+- Installed Node.js v22.22.0 via nvm
+- Installed pnpm 10.30.0 via corepack
+
+### Evidence
+- **node --version**: **PASS** — v22.22.0 (≥22 required)
+- **pnpm --version**: **PASS** — 10.30.0 (≥9 required)
+- **WSL distro**: Ubuntu 24.04.3 LTS
+
+### What's next
+- STEP 2: Build (pnpm install, build, ui:build)
+
+## 2026-02-18 — Phase 1A, STEP 2: Build
+
+### Changes
+- Moved build to native Linux FS (`~/openclaw-build/`) due to NTFS 9p EACCES rename issue
+- `pnpm install` completed (1012 packages, 2m 58.5s)
+- `pnpm build` completed (TypeScript + plugin SDK + hook metadata + export templates)
+- `pnpm ui:build` completed (161 modules, control-ui assets built)
+
+### Evidence
+- **pnpm install**: **PASS** — exit 0, "Done in 2m 58.5s" (1 retry for network timeout)
+- **pnpm build**: **PASS** — exit 0, dist/ generated
+- **pnpm ui:build**: **PASS** — exit 0, control-ui/index.html + assets built
+- **Build location**: `~/openclaw-build/` (native ext4, symlinked from plan references)
+- **Note**: `/mnt/d/` NTFS mount has EACCES on pnpm atomic renames; native FS used for build
+
+### What's next
+- STEP 3: Onboard + Gateway
+
+## 2026-02-18 — Phase 1A, STEP 3: Onboard + Gateway
+
+### Status: BLOCKED
+
+No model API key available. `~/.openclaw/` directory does not exist.
+
+### Evidence
+- **~/.openclaw/.env**: **BLOCKED** — file not found
+- **~/.openclaw/ dir**: **BLOCKED** — directory not found
+- **onboard**: **SKIPPED** — requires API key per plan instructions
+- **gateway start**: **SKIPPED** — depends on onboard
+- **health check**: **SKIPPED** — depends on gateway
+- **playwright screenshot**: **SKIPPED** — depends on gateway
+
+### To unblock
+1. `wsl bash -c 'mkdir -p ~/.openclaw'`
+2. Create `~/.openclaw/.env` with: `ANTHROPIC_API_KEY=sk-ant-...` or `OPENAI_API_KEY=sk-...`
+3. Run: `cd ~/openclaw-build && pnpm openclaw onboard`
+4. Configure: gateway.bind=loopback, gateway.auth.mode=token, skip all channels
+5. Start: `pnpm openclaw start`
+6. Verify: `curl -s http://127.0.0.1:18789/health`
+
+### What's next
+- Phase 1B: STEP 4 (Context7 lookups)
+
+## 2026-02-18 — Phase 1B, STEPS 4–5: Research
+
+### Evidence
+- **Context7 (SKILL.md format)**: **PASS** — frontmatter: `name` + `description` required, optional `homepage`, `metadata.openclaw`
+- **Context7 (extension API)**: **PASS** — `api.registerChannel()`, `api.registerTool()`, `api.registerProvider()`, discovery via `openclaw.extensions` in package.json
+- **Context7 (config schema)**: **PASS** — full reference: gateway, agents, channels, session, tools, cron, bindings
+- **serena/file reads (skill discovery)**: **PASS** — skills scanned from bundled `skills/`, workspace `~/.openclaw/workspace/skills/`, extra dirs via `skills.load.extraDirs`
+- **serena/file reads (approval flow)**: **PASS** — found in `src/wizard/` (onboarding) + `src/plugins/types.ts` (registration API)
+- **serena/file reads (audit)**: **PASS** — `src/security/audit.ts` with findings model: checkId, severity, title, detail, remediation
+- **serena/file reads (extensions)**: **PASS** — `src/plugins/registry.ts`: registerTool, registerChannel, registerProvider
+
+### Key findings for skill stubs
+- SKILL.md requires `---` frontmatter with `name:` and `description:`
+- Optional: `homepage:`, `metadata.openclaw:` (emoji, requires, install)
+- Skills can have `scripts/`, `references/`, `assets/` subdirs
+- Extensions need `openclaw.plugin.json` manifest or `package.json` with `openclaw.extensions`
+- Audit system produces structured findings with severity levels
+
+### What's next
+- STEP 6: Create 8 skill stubs
+
+## 2026-02-18 — Phase 1B, STEPS 6–9: Scaffold + Validation
+
+### Changes (STEP 6)
+Created 8 skill stubs in `open-claw/skills/`:
+- `gmail-inbox/SKILL.md` — BLOCKED: Google Cloud project not created
+- `domain-email/SKILL.md` — BLOCKED: IMAP/SMTP credentials not provided
+- `sms-twilio/SKILL.md` — BLOCKED: Twilio credentials not provided
+- `whatsapp-official/SKILL.md` — BLOCKED: Meta Business not verified
+- `google-calendar/SKILL.md` — BLOCKED: Google Cloud project not created
+- `google-contacts/SKILL.md` — BLOCKED: Google Cloud project not created
+- `mem0-bridge/SKILL.md` — READY (requires mem0 MCP server)
+- `approval-gate/SKILL.md` — READY (framework, requires approval channel)
+
+### Changes (STEP 7)
+- `open-claw/configs/openclaw.template.json5` — full config template with 3-tier model routing
+- `open-claw/docs/VAULT_SETUP.md` — 1Password/Bitwarden CLI, startup scripts, rotation checklist
+- `open-claw/docs/BLOCKED_ITEMS.md` — 8 blocked items with exact user actions to unblock
+
+### Changes (STEP 8)
+- Verified `.cursor/rules/` covers project conventions (4 rule files)
+- Created `open-claw/docs/CODING_AGENT_MAPPING.md` — OpenClaw coding agent ↔ dev module mapping
+
+### Evidence (STEP 9)
+- **Secret scan**: **PASS** — no real secret patterns in repo (excluding vendor/)
+- **SKILL.md frontmatter**: **PASS** — 8/8 have valid `name:` and `description:` fields
+- **File paths**: **PASS** — all 12 new files exist
+
+### What's next
+- STEP 10: Finalize
+
+## 2026-02-18 — Phase 1, STEP 10: Finalize
+
+### Memory Tool
+- **WARN**: Memory Tool MCP server disconnected mid-session
+- Decisions documented in BLOCKED_ITEMS.md and skill SKILL.md files instead
+- Key decisions: WhatsApp official API only, 3-tier model routing, approval gates for all outbound
+
+### Phase 1 Summary
+| Step | Status | Key Evidence |
+|------|--------|-------------|
+| STEP 1 Environment | **PASS** | Node 22.22.0, pnpm 10.30.0 |
+| STEP 2 Build | **PASS** | install/build/ui:build all exit 0 (native Linux FS) |
+| STEP 3 Onboard | **BLOCKED** | No API key in ~/.openclaw/.env |
+| STEP 4 Context7 | **PASS** | SKILL.md format, extension API, config schema documented |
+| STEP 5 serena | **PASS** | Skill discovery, audit, extension loading analyzed |
+| STEP 6 Skills | **PASS** | 8 skill stubs created with valid frontmatter |
+| STEP 7 Configs | **PASS** | Template config + VAULT_SETUP + BLOCKED_ITEMS created |
+| STEP 8 Cursor | **PASS** | Rules verified, coding-agent mapping documented |
+| STEP 9 Validation | **PASS** | 0 secrets, 8/8 valid frontmatter, all paths exist |
+| STEP 10 Finalize | **PASS** | Memory (WARN: disconnected), STATE updated, Phase 2 drafted |
+
+### Deliverables
+- Build artifacts: `~/openclaw-build/dist/` (Node 22, pnpm, fully built)
+- 8 skill stubs: `open-claw/skills/{gmail-inbox,domain-email,sms-twilio,whatsapp-official,google-calendar,google-contacts,mem0-bridge,approval-gate}/SKILL.md`
+- Config template: `open-claw/configs/openclaw.template.json5`
+- New docs: VAULT_SETUP.md, BLOCKED_ITEMS.md, CODING_AGENT_MAPPING.md
+- Git: commit `feat: Phase 1 — gateway boot + integration scaffold`
+- Phase 2 plan drafted in PLAN.md
+
+### What's next
+- Phase 2: First Live Integration (awaiting user to unblock Gateway + provide credentials)
+
 <!--
 Format:
 

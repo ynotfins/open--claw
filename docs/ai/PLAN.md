@@ -32,21 +32,47 @@
 - [ ] `docs/ai/STATE.md` updated with Phase 1 evidence
 
 **AGENT prompt:**
-<!-- To be written by PLAN tab before Phase 1 execution -->
+<!-- Executed 2026-02-18; see STATE.md for evidence -->
 
 ---
 
-## Phase 2 — First Channel Integration
+## Phase 1 — Gateway Boot + Integration Scaffold ✅ (partial)
 
-**Goal:** Connect a messaging channel (WhatsApp or Telegram) and verify end-to-end message flow.
+**Status**: PASS with 1 BLOCKED item (Gateway Boot — no API key)
+
+**Completed:**
+- [x] Node.js 22+ and pnpm verified in WSL
+- [x] `pnpm install` + `pnpm build` + `pnpm ui:build` succeed
+- [x] 8 skill stubs created with valid SKILL.md frontmatter
+- [x] Config template with 3-tier model routing
+- [x] VAULT_SETUP.md + BLOCKED_ITEMS.md
+- [x] Validation: secrets, frontmatter, paths all clean
+
+**Blocked:**
+- [ ] `openclaw onboard` — requires API key in `~/.openclaw/.env`
+- [ ] Gateway start + health check — depends on onboard
+- [ ] Control UI screenshot — depends on gateway
+
+---
+
+## Phase 2 — First Live Integration
+
+**Goal:** Unblock the Gateway, connect the first integration, and verify end-to-end flow with approval gate.
+
+**Prerequisites (user must provide):**
+- At least one model API key (Anthropic or OpenAI) in `~/.openclaw/.env`
+- Optionally: Google Cloud project for Gmail/Calendar/Contacts
 
 **Exit criteria:**
-- [ ] At least one channel adapter configured and paired
-- [ ] Inbound message → agent response → outbound reply verified
-- [ ] DM policy set to `pairing` (safe default)
-- [ ] Channel-specific allowlists configured
-- [ ] Security audit: no exposed secrets, loopback binding confirmed
-- [ ] Integration documented in `open-claw/docs/`
+- [ ] Gateway running on loopback with token auth
+- [ ] Health check returns 200 at `http://127.0.0.1:18789/health`
+- [ ] Control UI loads and screenshot captured
+- [ ] At least one integration fully connected end-to-end
+- [ ] Approval gate tested (outbound action blocked until human approves)
+- [ ] Audit log captures the full action chain
+- [ ] Cost tracking active for the connected integration
+- [ ] Security review: no exposed secrets, sandboxing verified
+- [ ] `docs/ai/STATE.md` updated with Phase 2 evidence
 
 **AGENT prompt:**
 <!-- To be written by PLAN tab before Phase 2 execution -->
