@@ -365,6 +365,32 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 - Phase 1: **PASS** — environment hardened and verified
 - Phase 2: First Live Integration — blocked on API key provision (see `BLOCKED_ITEMS.md`)
 
+---
+
+## 2026-02-23 — Memory Tool MCP Verification & Backfill
+
+### Changes
+- Verified Memory Tool MCP connectivity: server `user-Memory Tool` is now **reachable**
+- Root cause of prior failure: transient MCP session drop (server was registered but not connected); reconnected without config change
+- Stored 4 durable facts backfilled from Phase 1 (were missed due to outage):
+  1. Node.js v22.22.0 managed via nvm in WSL
+  2. pnpm pinned to 10.23.0 via corepack
+  3. pnpm pinning command: `corepack prepare pnpm@10.23.0 --activate`
+  4. GitHub repo: `ynotfins/open-claw`, branch `master`
+  5. Gateway boot blocker: needs API key in `~/.openclaw/.env`
+
+### Evidence
+| Check | Status | Detail |
+|-------|--------|--------|
+| `memory-tool` CLI in WSL | **FAIL** | No CLI binary — Memory Tool is an MCP server, not a shell tool (expected) |
+| `CallMcpTool search_memories` | **PASS** | Returned `{"results": []}` (empty, correct — no prior facts stored) |
+| `CallMcpTool add_memory` × 4 | **PASS** | All 4 facts queued (status: PENDING, event IDs logged) |
+| Memory Tool server identifier | `user-Memory Tool` | Confirmed via `SERVER_METADATA.json` |
+
+### What's next
+- Memory Tool: **PASS** — callable and storing facts
+- Phase 2: First Live Integration — still blocked on API key provision
+
 <!--
 Format:
 
