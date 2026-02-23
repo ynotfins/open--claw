@@ -325,6 +325,46 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 ### What's next
 - Phase 2: First Live Integration (still awaiting API key)
 
+---
+
+## 2026-02-23 — Phase 1 Environment & Config Hardening
+
+### Changes
+- Executed Phase 1 AGENT prompt (environment verification, pnpm pinning, secret scan)
+- Pinned pnpm to **10.23.0** via `corepack prepare pnpm@10.23.0 --activate` (matches `vendor/openclaw/package.json` `packageManager` field)
+- Confirmed `.gitignore` covers all required patterns: `.env*`, `node_modules/`, `vendor/`, build artifacts
+- Secret scan on all tracked files (excluding `vendor/`, `.git/`) — no hardcoded secrets found
+
+### MCP Preflight Results
+| Tool | Status | Evidence |
+|------|--------|----------|
+| sequential-thinking | **PASS** | Minimal call returned thought response |
+| serena | **PASS** | `activate_project open-claw` succeeded |
+| Context7 | **PASS** | Resolved `/openclaw/openclaw` library ID (4730 snippets, High reputation) |
+| Exa Search | **PASS** | Fetched openclaw installer internals doc (2026-02-20) |
+| Memory Tool (mem0) | **FAIL** | Server `user-Memory Tool` not in active MCP list — documented inline instead |
+| GitHub MCP | **PASS** | `search_repositories` returned `ynotfins/open-claw` (id: 1162000439) |
+
+### Environment Evidence
+| Check | Result |
+|-------|--------|
+| WSL path `/mnt/d/github/open--claw` | **PASS** — exists |
+| `git --version` | **PASS** — git 2.43.0 |
+| `node --version` | **PASS** — v22.22.0 (≥22 required) |
+| `vendor/openclaw` `packageManager` | **PASS** — `pnpm@10.23.0` |
+| `corepack prepare pnpm@10.23.0 --activate` | **PASS** — pnpm now at 10.23.0 |
+| `.gitignore` coverage | **PASS** — all required patterns present |
+| Secret scan (hardcoded keys/tokens) | **PASS** — no matches |
+
+### Durable facts (stored inline — Memory Tool unavailable)
+- Node.js version: v22.22.0 (managed via nvm)
+- pnpm version: 10.23.0 (pinned via corepack, derived from vendor/openclaw packageManager field)
+- pnpm pinning approach: `corepack prepare pnpm@10.23.0 --activate` in WSL with nvm loaded
+
+### What's next
+- Phase 1: **PASS** — environment hardened and verified
+- Phase 2: First Live Integration — blocked on API key provision (see `BLOCKED_ITEMS.md`)
+
 <!--
 Format:
 
