@@ -515,6 +515,44 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 - **Reload Cursor** to deactivate old project-level server and confirm global `Filesystem` is green
 - Phase 2: still blocked on API key
 
+---
+
+## 2026-02-24 — Filesystem MCP Deterministic Setup
+
+### Changes
+- Created `docs/tooling/MCP_HEALTH.md` — full failure history + current config
+- Renamed MCP entry from `filesystem` → `filesystem-windows` in `~/.cursor/mcp.json`
+- Reverted args to backslash notation (`D:\github` etc.) — forward slashes caused `%3A` encoding issue
+- Fixed Desktop/Documents paths to OneDrive-redirected locations
+- WSL UNC root (`\\wsl.localhost\Ubuntu\mnt\d\github`) — **BLOCKED** (access denied from PowerShell)
+
+### Evidence — Phase A
+| Check | Result |
+|-------|--------|
+| node | v22.18.0 |
+| npm | 11.7.0 |
+| pnpm | 10.24.0 |
+| corepack | 0.33.0 |
+| WSL distro | Ubuntu |
+
+### Evidence — Phase B
+| Check | Status | Detail |
+|-------|--------|--------|
+| `Test-Path D:\github` | **PASS** | exists |
+| `Test-Path \\wsl.localhost\Ubuntu\mnt\d\github` | **BLOCKED** | Access denied |
+| Server smoke test | **PASS** | "Secure MCP Filesystem Server running on stdio" |
+| Cursor registration | **PENDING** | Requires Reload Window |
+
+### Evidence — Phase C (proof reads)
+| Test | Status |
+|------|--------|
+| `D:\github\open--claw\README.md` | PENDING |
+| `D:\github\AI-Project-Manager\AGENTS.md` | PENDING |
+| WSL UNC read | BLOCKED |
+
+### What's next
+- Reload Cursor → verify `filesystem-windows` green → run proof reads → update MCP_HEALTH.md
+
 <!--
 Format:
 
