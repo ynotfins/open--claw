@@ -463,6 +463,40 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 - Laptop reclone (if needed): `git clone https://github.com/ynotfins/open--claw.git`
 - Phase 2: still blocked on API key
 
+---
+
+## 2026-02-23 — Filesystem MCP Installed
+
+### Changes
+- Created `.cursor/mcp.json` with `@modelcontextprotocol/server-filesystem` pointing at `D:\github\open--claw`
+- File is gitignored (`.gitignore` line 10: `.cursor/mcp.json`) — not committed to repo
+- Cursor must be reloaded to activate the new MCP server
+
+### Evidence
+| Check | Status | Detail |
+|-------|--------|--------|
+| npx package resolve | **PASS** | `@modelcontextprotocol/server-filesystem` downloaded via npx cache |
+| `.cursor/mcp.json` created | **PASS** | Written to `D:\github\open--claw\.cursor\mcp.json` |
+| gitignore check | **PASS** | `check-ignore` confirms excluded at `.gitignore:10` |
+| Server smoke test | **PASS** | "Secure MCP Filesystem Server running on stdio" |
+
+### Config written
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "D:\\github\\open--claw"]
+    }
+  }
+}
+```
+
+### What's next
+- **Reload Cursor** (Ctrl+Shift+P → "Reload Window") to activate the filesystem MCP
+- Verify it appears as green in Tools & MCP tab
+- Phase 2: still blocked on API key
+
 <!--
 Format:
 
