@@ -605,6 +605,36 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 - Serena roots verification on laptop
 - Phase 2: still blocked on API key
 
+## 2026-02-26 — Global MCP Setup (Laptop → ChaosCentral parity)
+
+### Summary
+Installed Node.js 24.14.0, uv 0.10.6, shell-mcp-server 0.1.0. Wrote 16-server global `mcp.json`. Created `~/.serena/serena_config.yml` with both project paths. Created `AI-Project-Manager/docs/tooling/MCP_CANONICAL_CONFIG.md`. 4 servers BLOCKED on Bitwarden secrets (user must fill). Cursor restart required to activate.
+
+### Evidence
+
+| Check | Status | Detail |
+|-------|--------|--------|
+| Node.js install | **PASS** | v24.14.0 via winget |
+| uv/uvx install | **PASS** | 0.10.6 via winget (astral-sh.uv) |
+| shell-mcp-server install | **PASS** | 0.1.0 via `uv tool install`; exe at `C:\Users\ynotf\.local\bin\shell-mcp-server.exe` |
+| shell-mcp-server sync main() | **PASS** | `inspect.iscoroutinefunction(main) = False` — no patch needed |
+| mcp.json backup | **PASS** | `.backup.20260226-171958` |
+| mcp.json written (16 servers) | **PASS** | JSON parses cleanly; all server keys present |
+| Conflict check (both repos) | **PASS** | No per-project mcp.json found |
+| `~/.serena/serena_config.yml` | **PASS** | Created with `D:\github\open--claw` + `D:\github\AI-Project-Manager` |
+| Cursor restart | **PENDING** | User must quit/reopen Cursor |
+| Tool visibility | **PENDING** | Post-restart verification by user |
+| 4 secret-dependent servers | **BLOCKED** | `github`, `firecrawl-mcp`, `Magic MCP`, `googlesheets-tvi8pq-94` — fill from Bitwarden |
+
+### What's next
+- User fills 4 secrets from Bitwarden into `C:\Users\ynotf\.cursor\mcp.json`
+- Fully restart Cursor
+- Verify all 16 servers show tools in Settings → Tools & MCP
+- Update this entry with PASS/FAIL per server
+- Phase 2: still blocked on API key (`~/.openclaw/.env`)
+
+---
+
 ## 2026-02-26 — Laptop Parity + MCP/Serena Health Proof
 
 ### Summary

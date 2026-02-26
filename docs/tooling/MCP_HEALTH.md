@@ -157,3 +157,130 @@ The `@modelcontextprotocol/server-filesystem` MCP server is not active in this s
 | Write/edit/move/create/delete tools | N/A (native Read tool) | **PASS** | No write operations available via this read path |
 
 **Filesystem verdict: PASS (reads) — no active filesystem MCP RO server; reads via native agent capability**
+
+---
+
+## 2026-02-26 — Global MCP Setup (Laptop → ChaosCentral parity)
+
+### Timestamp
+2026-02-26 (session date)
+
+### Machine
+`DESKTOP` / `C:\Users\ynotf`
+
+### Config path
+`C:\Users\ynotf\.cursor\mcp.json`
+
+---
+
+### A) Preflight
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| git version | **PASS** | `git version 2.52.0.windows.1` |
+| node (pre-install) | **FAIL → FIXED** | Not in PATH; not installed; installed Node.js LTS 24.14.0 via winget |
+| npm | **PASS** | `11.9.0` (after Node install) |
+| npx | **PASS** | `11.9.0` |
+| winget | **PASS** | `v1.12.460` |
+| WSL distros | **PASS** | `docker-desktop`, `Ubuntu` |
+| mcp.json dir exists | **PASS** | `C:\Users\ynotf\.cursor\` exists |
+| mcp.json exists | **PASS** | Pre-existing (only GitKraken); backed up to `.backup.20260226-171958` |
+| Conflict check: open--claw `.cursor\mcp.json` | **PASS** | Not present |
+| Conflict check: open--claw `.vscode\mcp.json` | **PASS** | Not present |
+| Conflict check: AI-Project-Manager `.cursor\mcp.json` | **PASS** | Not present |
+| Conflict check: AI-Project-Manager `.vscode\mcp.json` | **PASS** | Not present |
+
+---
+
+### B) uv/uvx Install
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| winget search uv | **PASS** | Package ID: `astral-sh.uv` |
+| `winget install astral-sh.uv` | **PASS** | `uv 0.10.6` installed |
+| `uv --version` | **PASS** | `uv 0.10.6 (a91bcf268 2026-02-24)` |
+| `uvx --version` | **PASS** | `uvx 0.10.6` |
+
+---
+
+### C) shell-mcp-server Install + Patch
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| `uv tool install shell-mcp-server` | **PASS** | `shell-mcp-server==0.1.0` + 32 deps installed |
+| Executable location | **PASS** | `C:\Users\ynotf\.local\bin\shell-mcp-server.exe` |
+| `main()` is sync (not coroutine) | **PASS** | `inspect.iscoroutinefunction(main) = False` — `__init__.py` wraps `asyncio.run(server.main())` |
+| Patch required? | **NO** | v0.1.0 already correct — no manual patch needed |
+
+---
+
+### D) Global mcp.json Written
+
+| Server | Transport | Secrets | Status |
+|--------|-----------|---------|--------|
+| `GitKraken` | stdio | none | **PRESERVED** |
+| `Clear Thought 1.5` | http | none | **WRITTEN** |
+| `Context7` | http | none | **WRITTEN** |
+| `Exa Search` | http | none | **WRITTEN** |
+| `Memory Tool` | http | none | **WRITTEN** |
+| `Stripe` | http | none | **WRITTEN** |
+| `playwright` | stdio (npx) | none | **WRITTEN** |
+| `github` | stdio (npx) | `GITHUB_PERSONAL_ACCESS_TOKEN` | **BLOCKED** — placeholder; fill from Bitwarden |
+| `sequential-thinking` | stdio (npx) | none | **WRITTEN** |
+| `firecrawl-mcp` | stdio (npx) | `FIRECRAWL_API_KEY` | **BLOCKED** — placeholder; fill from Bitwarden |
+| `firestore-mcp` | stdio (npx smithery) | none | **WRITTEN** |
+| `Magic MCP` | stdio (cmd/npx) | Magic API key | **BLOCKED** — placeholder; fill from Bitwarden |
+| `googlesheets-tvi8pq-94` | http (composio) | `customerId` | **BLOCKED** — placeholder; fill from Bitwarden |
+| `serena` | stdio (uvx) | none | **WRITTEN** |
+| `filesystem_scoped` | stdio (npx) | none | **WRITTEN** |
+| `shell-mcp` | stdio (exe) | none | **WRITTEN** — exe: `C:\Users\ynotf\.local\bin\shell-mcp-server.exe` |
+| JSON parse | | | **PASS** — `ConvertFrom-Json` succeeded |
+| Server count | | | **16 servers** listed |
+
+---
+
+### E) Serena Project Registration
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| `~/.serena/` directory | **CREATED** | `C:\Users\ynotf\.serena\` (was absent) |
+| `serena_config.yml` | **CREATED** | Written with 2 project paths |
+| `D:\github\open--claw` in projects | **PASS** | Present in config |
+| `D:\github\AI-Project-Manager` in projects | **PASS** | Present in config |
+| `D:\github\open-claw` (single dash) | **PASS** | Not present (old name excluded) |
+
+---
+
+### F) Cursor Restart + Tool Verification
+
+**PENDING USER ACTION** — Cannot be automated. Steps:
+
+1. Fully quit Cursor (`File → Exit`, not just reload)
+2. Reopen Cursor
+3. Go to **Settings → Tools & MCP** and verify each server shows tools
+4. For servers marked **BLOCKED**: fill secrets from Bitwarden before verifying
+5. Record PASS/FAIL below and update this entry
+
+| Server | Expected status after restart |
+|--------|-------------------------------|
+| Clear Thought 1.5 | PASS (no secret) |
+| Context7 | PASS (no secret) |
+| Exa Search | PASS (no secret) |
+| Memory Tool | PASS (no secret) |
+| Stripe | PASS (no secret) |
+| playwright | PASS (no secret) |
+| sequential-thinking | PASS (no secret) |
+| serena | PASS (uvx pulls from git on first use) |
+| filesystem_scoped | PASS (no secret) |
+| shell-mcp | PASS (no secret) |
+| GitKraken | PASS (preserved) |
+| github | BLOCKED until PAT filled |
+| firecrawl-mcp | BLOCKED until API key filled |
+| Magic MCP | BLOCKED until Magic key filled |
+| googlesheets-tvi8pq-94 | BLOCKED until customerId filled |
+| firestore-mcp | PASS (no secret; smithery CLI) |
+
+---
+
+### Reference
+Canonical config doc: `AI-Project-Manager/docs/tooling/MCP_CANONICAL_CONFIG.md`
