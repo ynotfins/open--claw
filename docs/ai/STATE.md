@@ -605,6 +605,39 @@ Thinking-class models (GPT-5.2 High, GPT-5.2 Extra High, GPT-5.2 Codex High, GPT
 - Serena roots verification on laptop
 - Phase 2: still blocked on API key
 
+## 2026-02-26 — Laptop Parity + MCP/Serena Health Proof
+
+### Summary
+Verified laptop == GitHub == ChaosCentral for `open--claw`. Probed Serena config and MCP tool visibility. Logged evidence in `docs/tooling/MCP_HEALTH.md`.
+
+### Evidence
+
+| Check | Status | Detail |
+|-------|--------|--------|
+| `git status` clean tree | **PASS** | Nothing to commit, working tree clean |
+| `git remote -v` canonical | **PASS** | `origin https://github.com/ynotfins/open--claw` |
+| Commit `02cdaf2` present | **PASS** | In log |
+| Commit `2a65835` present (HEAD) | **PASS** | HEAD is canonical sync evidence commit |
+| Serena `serena_config.yml` | **BLOCKED** | File not found at `~/.serena/`; directory absent; Serena not installed on this machine |
+| Serena in workspace MCP | **FAIL** | Not registered in AI-Project-Manager workspace descriptors |
+| Context7 MCP | **PASS** | `resolve-library-id` succeeded: `/openclaw/openclaw` 4730 snippets |
+| GitKraken MCP | **WARN** | Server reachable, 13 tools; `git_status` fails exit 128 on both repos (safe.directory inside gkcli) |
+| sequential-thinking MCP | **FAIL** | Not registered in this workspace |
+| Memory Tool (mem0) | **FAIL** | Not registered in this workspace |
+| filesystem RO MCP | **FAIL** | Project-level config removed (2026-02-24); not active this session |
+| `C:\Windows\win.ini` read | **PASS** | Content returned via native agent read |
+| `D:\github\open--claw\README.md` read | **PASS** | Full content returned |
+
+### Key findings
+- Serena is **not installed** on this laptop (no `~/.serena/` directory, no MCP registration). Requires explicit install + config before it can be used.
+- `serena`, `sequential-thinking`, and `Memory Tool` were previously available in the `open--claw` project workspace context. They are **not available** in the current `AI-Project-Manager` workspace.
+- GitKraken MCP: safe.directory fix applied via shell (`git config --global`) but gkcli has its own git instance that still hits exit 128. Not a blocking issue for current work.
+- Context7 and cursor-ide-browser are fully operational.
+
+### What's next
+- Install Serena on laptop if needed for future sessions (see fix steps in `docs/tooling/MCP_HEALTH.md`)
+- Phase 2: still blocked on API key (`~/.openclaw/.env`)
+
 <!--
 Format:
 

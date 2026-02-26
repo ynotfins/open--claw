@@ -75,3 +75,85 @@ wsl -d Ubuntu -e bash -c 'ls /mnt/d/github'
 | WSL UNC read | `\\wsl.localhost\Ubuntu\mnt\d\github\...` | **BLOCKED** | UNC access denied from PowerShell |
 
 ## Final Status: PASS (Windows), BLOCKED (WSL cross-platform)
+
+---
+
+## 2026-02-26 — Laptop Parity + MCP/Serena Health Proof
+
+### Timestamp
+2026-02-26T00:00:00Z (session date)
+
+---
+
+### A) Repo Parity
+
+| Check | Command | Status | Evidence |
+|-------|---------|--------|----------|
+| git safe.directory | `git config --global --add safe.directory D:/Github/open--claw` | **PASS** | exit 0 (required on this laptop's FS ownership) |
+| Working tree | `git -C D:\github\open--claw status` | **PASS** | "On branch master / nothing to commit, working tree clean" |
+| Remote | `git -C D:\github\open--claw remote -v` | **PASS** | `origin https://github.com/ynotfins/open--claw` (fetch + push) |
+| Canonical commits | `git -C D:\github\open--claw log --oneline -10` | **PASS** | HEAD = `2a65835` (STATE evidence commit), `02cdaf2` present |
+| Branch | | **PASS** | `master`, up to date with `origin/master` |
+
+**Parity verdict: PASS — laptop == GitHub == ChaosCentral**
+
+---
+
+### B) Serena Global Roots
+
+| Check | Status | Evidence |
+|-------|--------|----------|
+| `$env:USERPROFILE\.serena\serena_config.yml` exists | **FAIL** | File not found; `C:\Users\ynotf\.serena\` directory does not exist |
+| Alternate locations searched | | `$env:APPDATA\serena`, `$env:LOCALAPPDATA\serena`, `$env:USERPROFILE\.serena`, `D:\github\open--claw` — all empty |
+| `D:\github\open--claw` in projects list | **BLOCKED** | Cannot verify — config file absent |
+| `D:\github\AI-Project-Manager` in projects list | **BLOCKED** | Cannot verify — config file absent |
+| `D:\github\open-claw` (single dash) NOT in list | **BLOCKED** | Cannot verify — config file absent |
+| Serena MCP server in workspace descriptors | **FAIL** | `serena` server not present in `C:\Users\ynotf\.cursor\projects\d-Github-AI-Project-Manager\mcps\` — not registered in this workspace |
+
+**Serena verdict: BLOCKED — `serena_config.yml` absent; Serena MCP not registered in current workspace**
+
+#### Fix steps (do not execute without explicit instruction)
+```yaml
+# 1. Locate or install serena: pip install serena OR check if it's registered globally
+# 2. Initialize config: serena init (creates ~/.serena/serena_config.yml)
+# 3. Add projects:
+projects:
+  - path: D:\github\open--claw
+  - path: D:\github\AI-Project-Manager
+# 4. Ensure NO entry for D:\github\open-claw (single dash — old name)
+# 5. Register MCP in ~/.cursor/mcp.json under "serena" key
+# 6. Reload Cursor
+```
+
+---
+
+### C) MCP Tool Visibility (this workspace: AI-Project-Manager)
+
+| Server | Descriptor present | Tools callable | Status | Notes |
+|--------|-------------------|----------------|--------|-------|
+| `plugin-context7-plugin-context7` | YES (no tools/ dir) | YES | **PASS** | `resolve-library-id` returned `/openclaw/openclaw` (4730 snippets, High reputation) |
+| `user-GitKraken` | YES (13 tools) | PARTIAL | **WARN** | Server responds but `git_status` fails exit 128 on both repos (safe.directory issue within gkcli) |
+| `cursor-ide-browser` | YES (24 tools) | YES | **PASS** | Full browser automation tool set present |
+| `plugin-cloudflare-cloudflare-bindings` | YES (1 tool: mcp_auth) | UNKNOWN | **WARN** | Auth gate tool only — requires Cloudflare auth |
+| `plugin-cloudflare-cloudflare-builds` | YES (1 tool: mcp_auth) | UNKNOWN | **WARN** | Auth gate tool only |
+| `plugin-cloudflare-cloudflare-observability` | YES (1 tool: mcp_auth) | UNKNOWN | **WARN** | Auth gate tool only |
+| `serena` | **NO** | **NO** | **FAIL** | Not registered in this workspace |
+| `sequential-thinking` | **NO** | **NO** | **FAIL** | Not registered in this workspace |
+| `Memory Tool (mem0)` | **NO** | **NO** | **FAIL** | Not registered in this workspace (was registered in open--claw workspace context previously) |
+| `filesystem` (RO) | **NO** | **NO** | **FAIL** | Project-level `.cursor/mcp.json` removed (per 2026-02-24 entry); global config only has GitKraken |
+
+**Note**: Prior sessions (2026-02-23/24) used these MCP servers from the `open--claw` project workspace. This run is in the `AI-Project-Manager` workspace where only GitKraken, Context7, browser, and Cloudflare servers are registered.
+
+---
+
+### D) Filesystem Read Proof (agent native Read tool — read-only)
+
+The `@modelcontextprotocol/server-filesystem` MCP server is not active in this session (project-level config removed 2026-02-24; global config only has GitKraken). Reads performed via Cursor agent native file read (read-only capability).
+
+| Test | Path | Status | Evidence |
+|------|------|--------|----------|
+| Windows system read | `C:\Windows\win.ini` | **PASS** | Content: `; for 16-bit app support`, `[Mail] MAPI=1` |
+| Project README read | `D:\github\open--claw\README.md` | **PASS** | Full content returned: "# Open Claw / A modular AI assistant platform..." |
+| Write/edit/move/create/delete tools | N/A (native Read tool) | **PASS** | No write operations available via this read path |
+
+**Filesystem verdict: PASS (reads) — no active filesystem MCP RO server; reads via native agent capability**
