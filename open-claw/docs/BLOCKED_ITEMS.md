@@ -14,11 +14,11 @@ Items below are blocked pending user action unless explicitly marked resolved. T
 3. Gateway verification passed:
    - `cd ~/openclaw-build && pnpm openclaw gateway status`
    - `cd ~/openclaw-build && pnpm openclaw health`
-4. Control UI rendered at `http://127.0.0.1:18789/openclaw`.
+4. Control UI rendered at the local dashboard URL reported by `pnpm openclaw dashboard --no-open` (`http://127.0.0.1:18789/` in the verified ChaosCentral run).
 
 **Residual caveat**:
 
-- The Control UI browser session still needs the gateway token pasted in Control UI settings before the live chat panel will authenticate. This is no longer a credential/bootstrap blocker; it is a local dashboard-auth follow-up.
+- Prefer `cd ~/openclaw-build && pnpm openclaw dashboard --no-open` because it prints a tokenized Control UI URL (`#token=...`) that can authenticate the browser session without manual token pasting. If that URL is unavailable, fall back to `pnpm openclaw config get gateway.auth.token`.
 
 ## 2. Gmail Inbox Skill
 

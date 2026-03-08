@@ -928,3 +928,296 @@ None
 
 ### What's Next
 - Start the next PLAN step from the updated state logs. The next work can target first live integration or remaining launch-script/dashboard hardening, but not from the old “missing credential” blocker assumption.
+
+## 2026-03-07 — OpenClaw Gateway Token And WSL Shell Investigation
+
+### Goal
+Fix the stray WSL `fnm` shell-init error without disturbing the working `nvm` setup, verify the supported OpenClaw gateway-token retrieval path, and update the wrapper docs to match the observed dashboard-auth flow.
+
+### Scope
+- `D:/github/open--claw/docs/ai/STATE.md`
+- `D:/github/AI-Project-Manager/docs/ai/STATE.md`
+- `D:/github/open--claw/open-claw/docs/SETUP_NOTES.md`
+- `D:/github/open--claw/open-claw/docs/BLOCKED_ITEMS.md`
+- `~/.bashrc`
+- `~/.profile`
+- `~/.bash_profile`
+- `C:/Users/ynotf/.openclaw/fix_bashrc.py` (temporary helper)
+- `C:/Users/ynotf/.openclaw/probe_openclaw_gateway.sh` (temporary helper)
+
+### Commands / Tool Calls
+- `git status --short` (`D:/github/AI-Project-Manager`)
+- `git status --short` (`D:/github/open--claw`)
+- `ReadFile` on:
+  - `D:/github/AI-Project-Manager/.cursor/rules/00-global-core.md`
+  - `D:/github/AI-Project-Manager/.cursor/rules/05-global-mcp-usage.md`
+  - `D:/github/AI-Project-Manager/.cursor/rules/10-project-workflow.md`
+  - `D:/github/AI-Project-Manager/docs/ai/STATE.md`
+  - `D:/github/open--claw/docs/ai/STATE.md`
+  - `D:/github/open--claw/open-claw/docs/SETUP_NOTES.md`
+  - `D:/github/open--claw/open-claw/docs/BLOCKED_ITEMS.md`
+  - `D:/github/open--claw/vendor/openclaw/src/commands/dashboard.ts`
+  - `D:/github/open--claw/vendor/openclaw/src/cli/config-cli.ts`
+- `user-serena-activate_project` (`D:/github/AI-Project-Manager`)
+- `user-serena-activate_project` (`D:/github/open--claw`)
+- `user-serena-check_onboarding_performed`
+- `user-serena-search_for_pattern`
+- `rg` over `D:/github/open--claw/open-claw/docs` and `D:/github/AI-Project-Manager/docs`
+- `user-filesystem_scoped-write_file`:
+  - `C:/Users/ynotf/.openclaw/fix_bashrc.py`
+  - `C:/Users/ynotf/.openclaw/probe_openclaw_gateway.sh`
+- `user-openmemory-add-memory`
+- `wsl bash --noprofile --norc -lc "python3 /mnt/c/Users/ynotf/.openclaw/fix_bashrc.py"`
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"`
+- `wsl bash --noprofile --norc -lc "python3 - <<'PY' ... ~/.bashrc/.profile/.bash_profile inspection ... PY"`
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw gateway status && printf '\n---\n' && pnpm openclaw health"`
+- `wsl bash /mnt/c/Users/ynotf/.openclaw/probe_openclaw_gateway.sh`
+- `Remove-Item -Force "C:\Users\ynotf\.openclaw\fix_bashrc.py","C:\Users\ynotf\.openclaw\probe_openclaw_gateway.sh"`
+- `ReadLints` on:
+  - `D:/github/open--claw/open-claw/docs/SETUP_NOTES.md`
+  - `D:/github/open--claw/open-claw/docs/BLOCKED_ITEMS.md`
+  - `D:/github/AI-Project-Manager/docs/ai/STATE.md`
+  - `D:/github/open--claw/docs/ai/STATE.md`
+- `ApplyPatch` on:
+  - `D:/github/open--claw/open-claw/docs/SETUP_NOTES.md`
+  - `D:/github/open--claw/open-claw/docs/BLOCKED_ITEMS.md`
+  - `D:/github/AI-Project-Manager/docs/ai/STATE.md`
+  - `D:/github/open--claw/docs/ai/STATE.md`
+
+### Changes
+- Confirmed from source that `openclaw gateway` has no `token` subcommand; the supported raw-token path is `pnpm openclaw config get gateway.auth.token`.
+- Confirmed from source that `pnpm openclaw dashboard --no-open` prints a tokenized dashboard URL via `#token=...`.
+- Patched `~/.bashrc` so the stale `fnm` auto-switch line runs only when `fnm` is actually installed, while leaving the existing `nvm` initialization untouched.
+- Updated `open-claw/docs/SETUP_NOTES.md` to document `dashboard --no-open`, `config get gateway.auth.token`, and `doctor --generate-gateway-token`.
+- Updated `open-claw/docs/BLOCKED_ITEMS.md` so the dashboard-auth caveat points to the supported tokenized URL flow instead of manual token pasting as the default, and so the recorded dashboard URL matches the verified local path.
+- Appended synchronized execution evidence to both repos' `docs/ai/STATE.md`.
+- Removed the temporary helper scripts after verification completed.
+
+### Evidence
+- `git status --short` (`AI-Project-Manager`): **PASS** — paired governance repo was already dirty only in unrelated files; `docs/ai/STATE.md` was clean before this block.
+- `git status --short` (`open--claw`): **PASS** — pre-existing dirty state limited to untracked `docs/ai/context/` and `open-claw/docs/archive/`; target docs were clean before this block.
+- `ReadFile`: **PASS** — required rules, current state logs, wrapper docs, and OpenClaw source files were read before editing.
+- `user-serena-activate_project` (`D:/github/AI-Project-Manager`): **PASS** — Serena activated in markdown mode for the governance repo.
+- `user-serena-activate_project` (`D:/github/open--claw`): **FAIL** — `ValueError: No source files found in D:\github\open--claw`.
+- `user-serena-check_onboarding_performed`: **PASS** — onboarding already available for the activated governance repo.
+- `user-serena-search_for_pattern`: **PASS** — confirmed the wrapper docs lacked the narrow gateway-token command guidance being added here.
+- `rg`: **PASS** — located the wrapper docs still referencing `dashboard` without the tokenized `--no-open` path.
+- Initial inline shell patch attempts for `~/.bashrc`: **FAIL** — PowerShell/WSL quoting and the already-broken startup hook made the direct inline replacements unreliable.
+- `user-filesystem_scoped-write_file` + `wsl bash --noprofile --norc -lc "python3 /mnt/c/Users/ynotf/.openclaw/fix_bashrc.py"`: **PASS** — `~/.bashrc` updated successfully.
+- WSL shell inspection: **PASS** — `~/.profile` sources `~/.bashrc` and `~/.bash_profile` is missing, which explains why the stale `fnm` line fired in login shells.
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"`: **PASS** — Node `v22.22.0` and pnpm `10.23.0` resolved cleanly with no `fnm` error emitted.
+- Source inspection of `dashboard.ts` and `config-cli.ts`: **PASS** — implementation confirms `cfg.gateway?.auth?.token ?? process.env.OPENCLAW_GATEWAY_TOKEN ?? ""`, `dashboard --no-open`, and `config get gateway.auth.token`.
+- `wsl bash /mnt/c/Users/ynotf/.openclaw/probe_openclaw_gateway.sh`: **PASS** — confirmed `gateway.auth.token` is present and `dashboard --no-open` emits a tokenized dashboard URL. Secret values were intentionally redacted from repo docs.
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw gateway status && printf '\n---\n' && pnpm openclaw health"`: **PASS** — gateway runtime active, RPC probe `ok`, listener on `127.0.0.1:18789`, health output returned normally.
+- `Remove-Item -Force "C:\Users\ynotf\.openclaw\fix_bashrc.py","C:\Users\ynotf\.openclaw\probe_openclaw_gateway.sh"`: **PASS** — temporary helper scripts removed after use.
+- `user-openmemory-add-memory`: **FAIL then PASS** — first call failed because OpenMemory requires `user_preference` or `project_id`; retry with `user_preference=true` succeeded and started asynchronous ingestion.
+- `ReadLints`: **PASS (informational)** — markdownlint reported a large pre-existing warning backlog in the long-running `STATE.md` logs; no new targeted issue from `SETUP_NOTES.md` or `BLOCKED_ITEMS.md` required action.
+- `ApplyPatch` on wrapper docs + both `STATE.md` files: **PASS** — narrow documentation/state updates applied successfully.
+- Commit/push: **SKIPPED** — user did not request a commit, so changes were left uncommitted.
+
+### Verdict
+READY — the shell-init issue is fixed, the supported raw-token and tokenized-URL paths are verified, and the wrapper docs now point to the correct dashboard-auth workflow.
+
+### Blockers
+None
+
+### Fallbacks Used
+- `user-serena-activate_project` failed for `D:/github/open--claw`; fallback used: `rg` + targeted `ReadFile`.
+- Direct inline WSL patch commands were unreliable; fallback used: temporary helper scripts in `C:/Users/ynotf/.openclaw/` executed via `wsl bash --noprofile --norc`.
+- `user-openmemory-add-memory` initially failed without scope metadata; fallback used: retry with `user_preference=true`.
+
+### Cross-Repo Impact
+- `AI-Project-Manager` now records the same verified shell/token findings as governance evidence.
+- The paired repo's `docs/ai/STATE.md` stays synchronized with this runtime-facing record.
+
+### Decisions Captured
+- Treat `pnpm openclaw config get gateway.auth.token` as the canonical raw gateway-token retrieval path for the wrapper.
+- Prefer `pnpm openclaw dashboard --no-open` when a browser session needs the Control UI pre-authenticated via a tokenized URL.
+- Keep stale `fnm` hooks inert behind `command -v fnm` instead of removing working `nvm` initialization.
+
+### Pending Actions
+- If desired, re-open the Control UI from the printed tokenized URL and verify the browser session authenticates end-to-end.
+
+### What Remains Unverified
+- Whether launching the freshly printed tokenized dashboard URL in a browser fully clears the Control UI unauthorized state in this exact session; the command output path was verified, but the browser flow was not re-tested here.
+
+### What's Next
+- Lint the touched markdown files, then hand off the confirmed shell/token workflow along with the reusable AGENT prompt for future execution blocks.
+
+---
+
+## 2026-03-07 — WSL Shell + Gateway-Token Workflow Re-verification
+
+### Goal
+Re-verify the OpenClaw WSL shell init, Node environment, gateway-token retrieval, tokenized dashboard URL, and gateway health after PC restart. Confirm no regressions.
+
+### Scope
+- Runtime build: `~/openclaw-build`
+- Vendor source inspected: `vendor/openclaw/src/commands/dashboard.ts`, `vendor/openclaw/src/cli/config-cli.ts`
+- Files edited: `docs/ai/STATE.md`
+
+### Commands / Tool Calls
+- `grep -n 'fnm' ~/.bashrc` — shell inspection
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"` — Node environment
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw config get gateway.auth.token"` — token retrieval
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw dashboard --no-open"` — tokenized URL
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw gateway status && pnpm openclaw health"` — gateway state
+
+### Changes
+- Appended this execution block to `docs/ai/STATE.md`.
+- No code, config, or shell-init changes.
+
+### Evidence
+- `~/.bashrc` fnm guard: `if command -v fnm >/dev/null 2>&1; then eval "$(fnm env --use-on-cd)"; fi` already in place at lines 126-127: **PASS — no edit needed**
+- Node + pnpm: `v22.22.0` and `10.23.0` — no fnm error: **PASS**
+- `pnpm openclaw config get gateway.auth.token`: token present (`<REDACTED>`): **PASS**
+- `pnpm openclaw dashboard --no-open`: `Dashboard URL: http://127.0.0.1:18789/#token=<REDACTED>`, copied to clipboard: **PASS**
+- `pnpm openclaw gateway status`: `Runtime: running (pid 8501)`, `RPC probe: ok`, `Listening: 127.0.0.1:18789`: **PASS**
+- `pnpm openclaw health`: `Agents: main (default)`, heartbeat `30m`: **PASS**
+- Non-blocking warning: service uses nvm Node, recommend `openclaw doctor --repair` when system Node 22 available: **WARN**
+
+### Verdict
+READY — all checks pass, no regressions.
+
+### Blockers
+None
+
+### Fallbacks Used
+None
+
+### Cross-Repo Impact
+- `AI-Project-Manager` records the same verified findings as governance evidence.
+
+### Decisions Captured
+- fnm guard already in place; do not modify `~/.bashrc`.
+- `pnpm openclaw config get gateway.auth.token` — confirmed working.
+- `pnpm openclaw dashboard --no-open` — confirmed working, emits `#token=` URL.
+- Gateway runtime active and healthy on `127.0.0.1:18789`.
+
+### Pending Actions
+- Optional: `openclaw doctor --repair` to address nvm-vs-system-Node service warning.
+
+### What Remains Unverified
+- Browser-side Control UI token flow not tested.
+
+### What's Next
+- Proceed to Phase 6C or next operational step per `docs/ai/PLAN.md`.
+
+---
+
+## 2026-03-07 — fnm cd-hook fix + gateway-token workflow verification
+
+### Goal
+Stop fresh WSL shells from printing `Command 'fnm' not found`. Make the fnm cd-hook inert. Keep nvm Node 22 intact. Re-verify token and dashboard URL commands.
+
+### Scope
+- `~/.bashrc` (WSL home, machine-local, not repo-tracked)
+- `docs/ai/STATE.md` appended
+
+### Commands / Tool Calls
+- `wsl bash --noprofile --norc -c "sed -n '115,135p' ~/.bashrc"` — read full fnm block
+- `wsl bash -lc "ls -la /home/ynotf/.local/share/fnm"` — confirm binary
+- Helper script via `wsl bash --noprofile --norc` — comment out `eval "$(fnm env --use-on-cd)"` at line 127
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"` — post-fix verification
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw config get gateway.auth.token"` — token
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw dashboard --no-open"` — tokenized URL
+- `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/openclaw-build && pnpm openclaw gateway status && pnpm openclaw health"` — gateway
+
+### Changes
+- `~/.bashrc` line 127: `eval "$(fnm env --use-on-cd)"` → `# eval "$(fnm env --use-on-cd)"  # disabled: conflicts with nvm PATH resets`
+
+### Evidence
+- Root cause: fnm binary exists at `~/.local/share/fnm/fnm` (v1.38.1). `fnm env --use-on-cd` installs a `cd` hook. `source ~/.nvm/nvm.sh` resets PATH, dropping the fnm multishell path, causing hook to fail on every `cd`.
+- `.bashrc` edit applied: **PASS**
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"`: `v22.22.0` / `10.23.0`, no fnm error: **PASS**
+- `pnpm openclaw config get gateway.auth.token`: token present: **PASS**
+- `pnpm openclaw dashboard --no-open`: `Dashboard URL: http://127.0.0.1:18789/#token=<REDACTED>`: **PASS**
+- `pnpm openclaw gateway status`: `running (pid 8501)`, `RPC probe: ok`: **PASS**
+- `pnpm openclaw health`: `Agents: main (default)`: **PASS**
+
+### Verdict
+READY — fnm hook inert, nvm intact, all gateway commands working.
+
+### Blockers
+None
+
+### Fallbacks Used
+- PowerShell string escaping prevented direct `sed -i` via `wsl bash --noprofile --norc -c`. Fallback: temporary helper script at `C:/Users/ynotf/.openclaw/fix_fnm.sh`, removed after use: **PASS**
+
+### Cross-Repo Impact
+- `AI-Project-Manager/docs/ai/STATE.md` records the same evidence as governance log.
+
+### Decisions Captured
+- fnm binary exists and runs but conflicts with nvm. Fix is to disable only the cd-hook eval, not remove fnm.
+- `pnpm openclaw config get gateway.auth.token` — canonical raw-token command.
+- `pnpm openclaw dashboard --no-open` — canonical tokenized-URL command.
+- `node openclaw.mjs gateway token` — invalid command (confirmed from terminal output).
+
+### Pending Actions
+- Optional: `openclaw doctor --repair` when system Node 22 available.
+- Optional: browser Control UI auth end-to-end test.
+
+### What Remains Unverified
+- fnm fix behavior in a fully new interactive WSL session (not just `wsl bash -lc`).
+
+### What's Next
+- Proceed to Phase 6C or next operational step per `docs/ai/PLAN.md`.
+
+---
+
+## 2026-03-07 — Fix .bashrc syntax error (empty if/fi body) + re-verify gateway
+
+### Goal
+Fix `syntax error near unexpected token 'fi'` caused by prior fix leaving an `if/then/fi` with empty body. Re-verify all token and gateway commands.
+
+### Scope
+- `~/.bashrc` (WSL home, machine-local)
+- `docs/ai/STATE.md` appended
+
+### Commands / Tool Calls
+- `wsl bash --noprofile --norc -c "bash -n /home/ynotf/.bashrc"` — syntax check pre-fix
+- `wsl bash --noprofile --norc -c "cp ~/.bashrc ~/.bashrc.bak.pre_fi_fix"` — backup
+- Three `sed -i` commands — comment out `if` (line 126) and `fi` (line 128)
+- `wsl bash --noprofile --norc -c "bash -n /home/ynotf/.bashrc"` — syntax check post-fix
+- `wsl bash -ic "echo shell-start-ok"` — interactive shell test
+- `wsl bash -lc "source ~/.nvm/nvm.sh && nvm use 22 && node -v && pnpm -v"` — Node
+- `wsl bash -lc "... pnpm openclaw config get gateway.auth.token"` — token
+- `wsl bash -lc "... pnpm openclaw dashboard --no-open"` — tokenized URL
+- `wsl bash -lc "... pnpm openclaw gateway status && pnpm openclaw health"` — gateway
+
+### Changes
+- `~/.bashrc` lines 126, 128: `if` and `fi` lines prefixed with `#`. Entire fnm auto-switch block now fully commented out.
+
+### Evidence
+- `bash -n` before: `line 128: syntax error near unexpected token 'fi'`: **FAIL (expected)**
+- `bash -n` after: `SYNTAX_OK`: **PASS**
+- `bash -ic "echo shell-start-ok"`: no errors: **PASS**
+- `nvm use 22 && node -v && pnpm -v`: `v22.22.0` / `10.23.0`: **PASS**
+- `pnpm openclaw config get gateway.auth.token`: present: **PASS**
+- `pnpm openclaw dashboard --no-open`: `#token=<REDACTED>`: **PASS**
+- `gateway status`: `running`, `RPC probe: ok`: **PASS**
+- `health`: `Agents: main (default)`: **PASS**
+
+### Verdict
+READY — syntax error fixed, all checks pass.
+
+### Blockers
+None
+
+### Fallbacks Used
+- Helper script failed due to Windows line endings; used inline `sed -i` commands.
+
+### Cross-Repo Impact
+- `AI-Project-Manager/docs/ai/STATE.md` records the same evidence.
+
+### Decisions Captured
+- Bash `if/then/fi` with only a comment body is a syntax error. Must comment out the `if` and `fi` lines too, not just the body.
+
+### Pending Actions
+- Optional: `openclaw doctor --repair`, browser token auth test.
+
+### What Remains Unverified
+- Browser-side Control UI token flow.
+
+### What's Next
+- Proceed to Phase 6C or next operational step per `docs/ai/PLAN.md`.

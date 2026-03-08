@@ -87,6 +87,9 @@ pnpm openclaw health
 
 # Open the Control UI
 pnpm openclaw dashboard
+
+# Print a tokenized Control UI URL without opening a browser
+pnpm openclaw dashboard --no-open
 ```
 
 For foreground debugging instead of the managed service:
@@ -104,9 +107,12 @@ pnpm openclaw gateway
 | `pnpm openclaw gateway status` | Check the managed gateway service and probe reachability |
 | `pnpm openclaw health` | Query gateway health through the CLI |
 | `pnpm openclaw dashboard` | Open the Control UI |
+| `pnpm openclaw dashboard --no-open` | Print a tokenized Control UI URL for manual/browser launch |
 | `pnpm openclaw gateway` | Run the gateway in the foreground for debugging |
+| `pnpm openclaw config get gateway.auth.token` | Print the configured gateway auth token |
 | `pnpm openclaw config set <key> <value>` | Update config |
 | `pnpm openclaw doctor` | Diagnostics and repair helpers |
+| `pnpm openclaw doctor --generate-gateway-token` | Generate a gateway token if config does not already have one |
 | `pnpm test` | Run test suite |
 | `pnpm build` | TypeScript build |
 
