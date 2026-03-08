@@ -12,7 +12,7 @@ This repo uses a five-tab Cursor workflow: PLAN / AGENT / DEBUG / ASK / ARCHIVE.
 
 ## State tracking
 
-- `docs/ai/STATE.md` — current state (AGENT updates after each block)
+- `docs/ai/STATE.md` — **primary operational log**; PLAN reads this first to understand current state, blockers, fallbacks, and cross-repo effects. AGENT updates it after every execution block using the enforced template in `10-project-workflow.md`.
 - `docs/ai/PLAN.md` — active plan with phases and exit criteria
 
 ## MCP policy
@@ -25,7 +25,7 @@ Configuration lives outside the repo. Rules enforce behavior, not plumbing.
 
 AGENT must:
 - Follow PLAN prompts exactly
-- Update `docs/ai/STATE.md` after each execution block
+- Update `docs/ai/STATE.md` after each execution block using the enforced template in `10-project-workflow.md`
 - Provide PASS/FAIL evidence for every tool call and command
 - Use MCP tools before falling back to manual approaches
 

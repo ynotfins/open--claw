@@ -27,11 +27,9 @@ Planning and execution are never mixed in the same tab.
 
 ## State updates
 
-AGENT must update `docs/ai/STATE.md` after every execution block:
-- What changed
-- What was run
-- PASS/FAIL evidence
-- What is next
+`docs/ai/STATE.md` is the **primary operational source of truth** for PLAN. PLAN must read it before reasoning about blockers, fallbacks, next actions, and cross-repo effects.
+
+AGENT must update `docs/ai/STATE.md` after every execution block using the enforced section template defined in `10-project-workflow.md`. Every section is required; write `None` or `N/A` if a section has nothing to report. Do not omit sections.
 
 ## No unauthorized refactors
 
