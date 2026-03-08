@@ -17,6 +17,14 @@ Open Claw is a modular AI assistant platform. Development spans multiple domains
 (orchestrator, memory, dev tools, comms, web). Phases should be scoped to one
 module or integration at a time to keep diffs reviewable.
 
+## Canonical runtime sources
+
+For OpenClaw runtime behavior, setup, hosting, and operator workflows:
+1. https://docs.openclaw.ai/ (official docs)
+2. https://github.com/openclaw/openclaw (upstream source)
+
+Local wrapper docs in `open-claw/docs/` are subordinate and must not contradict these sources. Governance, workflow, and memory rules remain owned by AI-Project-Manager.
+
 ## PLAN output contract
 
 PLAN must produce:
@@ -42,7 +50,7 @@ AGENT must:
 Every AGENT execution block appended to `docs/ai/STATE.md` must use this exact structure. Omitting any section is not permitted; write `None` or `N/A` if there is nothing to report.
 
 ```markdown
-## <YYYY-MM-DD> — <task name>
+## <YYYY-MM-DD HH:MM> — <task name>
 
 ### Goal
 One or two sentences stating what this block aimed to achieve.

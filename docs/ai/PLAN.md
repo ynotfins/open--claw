@@ -51,7 +51,7 @@
 - [x] `openclaw onboard --install-daemon` completed via the supported non-interactive flow
 - [x] `openclaw gateway status` succeeds
 - [x] `openclaw health` succeeds
-- [x] Control UI renders at `http://127.0.0.1:18789/openclaw` and screenshot evidence was captured
+- [x] Control UI renders at `http://127.0.0.1:18789/` and screenshot evidence was captured
 
 **Residual caveat:**
 - [ ] Paste the gateway token into Control UI settings if you want the in-browser chat session to authenticate immediately

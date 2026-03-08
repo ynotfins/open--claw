@@ -1,5 +1,7 @@
 # OpenClaw — Setup Notes
 
+> Official docs: https://docs.openclaw.ai/ | Upstream repo: https://github.com/openclaw/openclaw
+
 ## Purpose
 
 This is a local wrapper note for running OpenClaw in this environment.
