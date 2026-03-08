@@ -1221,3 +1221,69 @@ None
 
 ### What's Next
 - Proceed to Phase 6C or next operational step per `docs/ai/PLAN.md`.
+
+---
+
+## 2026-03-08 — Sync 13-section STATE.md template to open--claw rules
+
+### Goal
+Make open--claw's governance rules self-sufficient by adding the 13-section STATE.md entry template that was previously only defined in AI-Project-Manager.
+
+### Scope
+Files edited: `open--claw/.cursor/rules/10-project-workflow.md`, `open--claw/.cursor/rules/00-global-core.md`, `open--claw/AGENTS.md`. Repos affected: open--claw only.
+
+### Commands / Tool Calls
+- `Read` tool: AI-Project-Manager/.cursor/rules/10-project-workflow.md (source template)
+- `Read` tool: open--claw/.cursor/rules/10-project-workflow.md (target)
+- `Read` tool: open--claw/.cursor/rules/00-global-core.md (target)
+- `Read` tool: open--claw/AGENTS.md (target)
+- `StrReplace` tool: 10-project-workflow.md — inserted 13-section template block
+- `StrReplace` tool: 00-global-core.md — replaced 4-bullet format with template reference
+- `StrReplace` tool: AGENTS.md — updated State tracking and Agent contract sections
+- `Grep` tool: secret scan across open--claw
+- `Glob` tool: verified all path references in rules exist
+- `git add` + `git commit` + `git push origin master`
+
+### Changes
+- `open--claw/.cursor/rules/10-project-workflow.md`: Added full 13-section STATE.md entry template with canonical-source note pointing to AI-Project-Manager.
+- `open--claw/.cursor/rules/00-global-core.md`: Replaced 4-bullet state update format with template-referencing wording matching AI-PM's version.
+- `open--claw/AGENTS.md`: Updated State tracking description and Agent contract bullet to reference enforced template in `10-project-workflow.md`.
+
+### Evidence
+| Check | Result | Detail |
+|-------|--------|--------|
+| Template inserted in 10-project-workflow.md | **PASS** | 13 sections present, canonical-source note included |
+| 00-global-core.md updated | **PASS** | Now references template in 10-project-workflow.md |
+| AGENTS.md updated | **PASS** | Both State tracking and Agent contract reference template |
+| Case-duplicate files | **PASS** | NTFS case-insensitive; no duplicates possible |
+| Path references exist | **PASS** | All 9 referenced paths verified via Glob |
+| No secrets committed | **PASS** | Only match: placeholder `Bearer YOUR_KEY_HERE` in docs |
+| No circular references | **PASS** | Rule chain: 00 <- 05 <- 10 <- 15/20, no cycles |
+| Commit + push | **PASS** | `e5399eb` pushed to origin/master |
+
+### Verdict
+READY — open--claw now defines the same 13-section template as AI-Project-Manager.
+
+### Blockers
+None
+
+### Fallbacks Used
+None
+
+### Cross-Repo Impact
+AI-Project-Manager is unaffected. open--claw's rules now mirror AI-PM's STATE.md contract. This STATE.md entry is mirrored to both repos for traceability.
+
+### Decisions Captured
+- open--claw must define its own copy of the 13-section template (not rely on shared workspace loading AI-PM's rules).
+- AI-Project-Manager remains the canonical source; open--claw's template includes a canonical-source reference.
+- HH:MM timestamps deferred until Phase 6C or first ordering ambiguity.
+- Cross-repo mirroring rule deferred (convention is working, LOW severity).
+
+### Pending Actions
+None
+
+### What Remains Unverified
+- Whether open--claw opened as a standalone workspace (not multi-root) correctly loads the template. This requires a manual test outside the current workspace.
+
+### What's Next
+- Proceed to Phase 6C or next operational step per `docs/ai/PLAN.md`.
