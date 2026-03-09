@@ -1626,3 +1626,33 @@ BLOCKED — skills not deployed to live runtime. Config keys written but inert.
 
 ### What's Next
 Pivot Phase 6C.1 to a live-runtime-ready skill (`healthcheck`, `github`, or `weather`) OR unblock ClawHub install with mandatory code review for approval-gate.
+
+---
+
+## 2026-03-09 21:00 — Phase 0: Session Bootstrap (mirror)
+
+### Goal
+Verify system state, tooling health, and decide forward path for Phase 6C.1. Full evidence in AI-Project-Manager STATE.md.
+
+### Verdict
+READY — session bootstrap complete.
+
+### Evidence Summary
+| Check | Result |
+|---|---|
+| Git state (both repos) | PASS — expected branches, clean/known mods, restore tag present |
+| WSL environment | PASS — Node v22.22.0, pnpm 10.23.0, ~/openclaw-build/ exists |
+| Gateway | PASS — PID 24301, ports 18789 (UI) / 18792 (API) |
+| MCP tools | Context7 PASS, GitHub PASS, Serena PASS (AI-PM), OpenMemory PASS. Firestore FAIL (pre-existing). |
+| STATE.md currency | PASS — both repos consistent, last entry 2026-03-09 19:10 |
+| Skills | PASS — 10/50 ready; healthcheck, github, weather all ✓ ready |
+
+### Decisions Captured
+- **PIVOT Phase 6C.1 to `weather` skill** as first integration test. Zero credentials, full pipeline exercise, lowest risk.
+- Gateway port correction: 18789 (UI) / 18792 (API), not 3000.
+
+### Cross-Repo Impact
+- AI-Project-Manager: full 13-section entry + DECISIONS.md updated
+
+### What's Next
+PLAN cycle for Phase 1 (Phase 6C.1): weather skill integration test.
