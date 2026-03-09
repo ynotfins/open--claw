@@ -1587,3 +1587,42 @@ None
 
 ### What's Next
 Phase 2: First live integration — connect one external integration, test approval gate, validate audit log.
+
+---
+
+## 2026-03-09 19:10 — Phase 6C.1 Attempt: approval-gate + mem0-bridge (BLOCKED)
+
+### Goal
+Enable approval-gate and mem0-bridge skills in the live runtime and verify behavior.
+
+### Verdict
+BLOCKED — skills not deployed to live runtime. Config keys written but inert.
+
+### Evidence Summary
+| Check | Result |
+|---|---|
+| Gateway status + health | PASS — running, RPC ok, 1 session |
+| `approval-gate` in `~/openclaw-build/skills/` | FAIL — not present |
+| `mem0-bridge` in `~/openclaw-build/skills/` | FAIL — not present |
+| `skills list` (9/50 ready) | PASS — command works; neither target skill listed |
+| Config keys written | PASS — `~/.openclaw/openclaw.json` updated; inert without skill deployment |
+| Gateway restart | PASS — running after restart |
+| Skill loading in log | FAIL — no skill messages; runtime ignores unknown skill config |
+| OpenMemory proxy at `:8766` | FAIL — Connection refused; Windows-side proxy not running in WSL |
+
+### Blockers
+1. `approval-gate` and `mem0-bridge` are **planning stubs in this repo** (`open-claw/skills/`), not deployed packages in `~/openclaw-build/skills/`. Must install via ClawHub (requires code review per DECISIONS.md) or manual copy.
+2. `approval-gate` requires a paired messaging channel (`APPROVAL_CHANNEL` + `APPROVAL_TARGET`) — none configured.
+3. OpenMemory proxy at `:8766` not reachable from WSL; requires Windows-side `bws run` launch.
+
+### Cross-Repo Impact
+- AI-Project-Manager: STATE.md template fixed (line 12 now has HH:MM). Full evidence entry recorded there.
+- This entry is a concise mirror.
+
+### Decisions Captured
+- Skill planning stubs in `open-claw/skills/` are not auto-deployed; ClawHub or manual deployment required.
+- Config keys for non-existent skills are written without error but have no runtime effect.
+- Recommend pivot to a `ready` bundled skill (healthcheck, github, weather) for Phase 6C.1 instead.
+
+### What's Next
+Pivot Phase 6C.1 to a live-runtime-ready skill (`healthcheck`, `github`, or `weather`) OR unblock ClawHub install with mandatory code review for approval-gate.
