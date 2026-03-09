@@ -1459,3 +1459,70 @@ None
 
 ### What's Next
 Phase 6C: First live integration (requires Gateway running with ANTHROPIC_API_KEY).
+
+---
+
+## 2026-03-08 20:01 — Phase 6C.0: Gateway Liveness + First Agent Chat
+
+### Goal
+Verify gateway runtime health, authenticate to Control UI, confirm first agent chat, and close Phase 1 in this repo.
+
+### Scope
+- Phase 1 fully closed; Phase 2 marked OPEN in `docs/ai/PLAN.md`
+- Machine-local: WSL gateway + Playwright browser automation
+- See `AI-Project-Manager/docs/ai/STATE.md` for full command log
+
+### Commands / Tool Calls
+See `AI-Project-Manager/docs/ai/STATE.md 2026-03-08 20:01` for full evidence. Key commands:
+- `wsl bash -ic "node -v && pnpm -v"` — node v22.22.0, pnpm 10.23.0
+- `wsl bash -ic "cd ~/openclaw-build && pnpm openclaw gateway status"` — running, RPC probe ok
+- `wsl bash -ic "cd ~/openclaw-build && pnpm openclaw health"` — agents: main (default)
+- `wsl bash -ic "cd ~/openclaw-build && pnpm openclaw dashboard --no-open"` — tokenized URL obtained
+- Playwright: navigate → screenshot → send prompt → wait → screenshot
+- `cat ~/.openclaw/agents/main/sessions/sessions.json` — session evidence
+- `tail -30 /tmp/openclaw/openclaw-2026-03-08.log` — gateway log evidence
+
+### Changes
+- `open--claw/docs/ai/PLAN.md`: Phase 1 residual caveat resolved; 6C.0 evidence block added; Phase 2 marked OPEN
+- `open--claw/docs/ai/STATE.md`: this entry
+
+### Evidence
+- `node -v` → v22.22.0: **PASS**
+- `pnpm -v` → 10.23.0: **PASS**
+- `gateway status` → running, RPC probe ok: **PASS**
+- `health` → Agents: main (default): **PASS**
+- Control UI: Health OK, chat input active: **PASS**
+- Agent response: `"Model: Claude Opus 4 (anthropic/claude-opus-4-6)"`: **PASS**
+- Session store: sessionId `64a8f306-71f0-4dc1-bba3-7f9144764ee4`: **PASS**
+- Gateway log: runId `5a47a2b6-86fd-4c0a-b0d0-770b0e3b8d0f`, `isError=false`, `durationMs=4514`: **PASS**
+
+### Verdict
+READY — Phase 1 closed. First agent chat verified. Phase 2 is next.
+
+### Blockers
+None
+
+### Fallbacks Used
+- `pnpm openclaw sessions list` not a valid command; used `sessions.json` file read instead.
+
+### Cross-Repo Impact
+- **AI-Project-Manager** (canonical governance repo): Phase 6B closed; Phase 6C unblocked. Evidence canonical there.
+- **open--claw** (this repo, wrapper/runtime): Phase 1 closed; Phase 2 opened.
+
+### Decisions Captured
+See `AI-Project-Manager/docs/ai/STATE.md` — session listing fallback and accessibility-vs-visual screenshot reliability note.
+
+### Pending Actions
+None
+
+### What Remains Unverified
+
+**Machine-local items:**
+- `loginctl enable-linger ynotf` status unknown.
+- `openclaw doctor --repair` nvm/systemd warning unresolved (deferred).
+
+**Repo-tracked items:**
+- None.
+
+### What's Next
+Phase 2: First live integration — connect one external integration, test approval gate, validate audit log.

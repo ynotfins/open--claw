@@ -53,12 +53,17 @@
 - [x] `openclaw health` succeeds
 - [x] Control UI renders at `http://127.0.0.1:18789/` and screenshot evidence was captured
 
-**Residual caveat:**
-- [ ] Paste the gateway token into Control UI settings if you want the in-browser chat session to authenticate immediately
+**6C.0 entry verified (2026-03-08):**
+- [x] Control UI authenticated (Health: OK, tokenized URL flow confirmed)
+- [x] First agent chat: model `anthropic/claude-opus-4-6`, session `64a8f306-71f0-4dc1-bba3-7f9144764ee4`
+- [x] Gateway log: `isError=false`, `durationMs=4514`
+
+**Residual item (resolved):**
+- [x] Control UI token auth confirmed working via tokenized dashboard URL
 
 ---
 
-## Phase 2 — First Live Integration
+## Phase 2 — First Live Integration (OPEN)
 
 **Goal:** Unblock the gateway, connect the first integration, and verify end-to-end flow with an approval gate.
 
