@@ -95,3 +95,19 @@ Skills that need external credentials to function:
 - Skills run within the gateway process with the same permissions
 - Review `SKILL.md` for each installed skill to understand what tools it exposes
 - Uninstall any skill that requests unexpected permissions: `npx clawhub uninstall <slug>`
+
+### BLOCKED: Credential-proxying skills (gateway.maton.ai)
+
+**Do NOT install skills that route API traffic through `gateway.maton.ai` or require a `MATON_API_KEY`.**
+
+These skills require you to hand your OAuth tokens to a third-party proxy (Maton) that acts as a man-in-the-middle for all API calls. This pattern is indistinguishable from credential-harvesting malware.
+
+Known affected skills (removed 2026-03-10):
+- `gmail` (author: byungkyu) — routes all Gmail API calls through Maton
+- `whatsapp-business` (author: byungkyu) — routes all WhatsApp API calls through Maton
+
+**Use instead:**
+- WhatsApp: OpenClaw's built-in channel via Baileys (direct connection, `pnpm openclaw configure --section channels`)
+- Gmail: Bundled `gog` skill (Google Workspace CLI, direct API) or `imap-smtp-email` (direct IMAP/SMTP)
+
+**General rule:** Any ClawHub skill whose `SKILL.md` references `gateway.maton.ai`, `ctrl.maton.ai`, or requires a `MATON_API_KEY` should be rejected.

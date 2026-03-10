@@ -1684,3 +1684,20 @@ PLAN cycle for Phase 1 (Phase 6C.1): weather skill integration test.
 2. System Chromium for Playwright in WSL
 3. Tier 3 credential setup (gmail, whatsapp, imap)
 4. Multi-skill agent workflows
+
+---
+
+## Execution Block: Security — Remove Maton-Dependent Skills
+**Timestamp:** 2026-03-10 00:23
+**Agent:** AGENT
+
+### Summary
+- Removed `gmail` and `whatsapp-business` ClawHub skills (credential-proxying via `gateway.maton.ai`)
+- Reverted `start-cursor-with-secrets.ps1`: removed MATON_API_KEY + WSL .env sync block
+- Gateway restarted: 18/58 skills ready
+- Added security warning to SKILL_MANAGEMENT.md
+
+### What's Next
+1. User: `pnpm openclaw configure --section channels` for built-in WhatsApp (QR scan)
+2. User: Delete MATON_API_KEY from Bitwarden
+3. Continue skill testing and multi-skill workflows
