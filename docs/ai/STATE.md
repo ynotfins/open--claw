@@ -1750,3 +1750,19 @@ First integration + approval gate test (Phase 6C / Phase 2 remaining criteria).
 
 ### What's Next
 Phase 2 exit criteria: first integration connected, approval gate tested.
+
+## 2026-03-10 01:30 — Phase 6C.2 continued: WhatsApp + skill/integration audit (mirror)
+
+Full entry in `AI-Project-Manager/docs/ai/STATE.md`.
+
+**Summary**: WhatsApp verified fully operational (linked, running, connected, selfChatMode, allowlist). 19/58 skills ready. REST API chat returns 405 — WebSocket only (does not affect channels). `gog` installed but unauthenticated (OAuth pending). `imap-smtp-email` available on ClawHub but not installed (MXRoute credentials needed). SMS/iMessage not viable on Windows/WSL. Agent not yet named (bootstrap pending first WhatsApp message).
+
+**Verdict**: READY — no blockers.
+
+**Pending user actions**: (1) Name agent via WhatsApp, (2) Gmail OAuth setup in Google Cloud Console + `gog auth add`, (3) provide MXRoute credentials for `imap-smtp-email` install.
+
+### What's Next
+1. User names agent via WhatsApp
+2. Gmail OAuth setup (`gog`)
+3. MXRoute email integration (`imap-smtp-email`)
+4. Close remaining Phase 6C exit criteria
