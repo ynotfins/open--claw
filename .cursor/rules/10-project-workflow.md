@@ -100,6 +100,10 @@ DEBUG must produce:
 - Reproduction steps with evidence
 - One AGENT prompt to implement and verify the fix
 
+## docs/ai/archive/ — never consulted
+
+`docs/ai/archive/` stores superseded documents that have been replaced by newer versions. PLAN must **never** consult this directory when reconstructing system state. It exists solely for historical reference and audit trails. Files moved here are considered retired from the active governance surface.
+
 ## Context attachment discipline
 
 - Attach files with intent, not habit.

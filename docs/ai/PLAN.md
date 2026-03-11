@@ -16,50 +16,24 @@
 
 ---
 
-## Phase 1 — Development Environment And Gateway Boot
+## Phase 1 — Gateway Boot + Integration Scaffold ✅
 
 **Goal:** Install dependencies, build OpenClaw, run onboarding, and verify gateway connectivity.
 
 **Exit criteria:**
-- [ ] Node.js `>=22.12.0` and pnpm `10.23.0` verified in WSL
-- [ ] `pnpm install` completes successfully in the Linux build copy
-- [ ] `pnpm build` and `pnpm ui:build` succeed
-- [ ] `openclaw onboard --install-daemon` runs successfully
-- [ ] `openclaw gateway status` shows the managed gateway is reachable
-- [ ] `openclaw health` succeeds
-- [ ] Control UI opens at `http://127.0.0.1:18789/` or via `openclaw dashboard`
-- [ ] `openclaw.json` created with secure defaults (loopback, token auth)
-- [ ] No secrets committed to repo
-- [ ] `docs/ai/STATE.md` updated with Phase 1 evidence
-
-**AGENT prompt:**
-<!-- Historical execution details live in STATE.md. -->
-
----
-
-## Phase 1 — Gateway Boot + Integration Scaffold ✅ (partial)
-
-**Status:** PASS — Gateway Boot completed on ChaosCentral; dashboard reachability verified with one residual token-auth caveat in the Control UI.
-
-**Completed:**
-- [x] Node.js and pnpm verified in WSL
+- [x] Node.js `>=22.12.0` and pnpm `10.23.0` verified in WSL
 - [x] `pnpm install` + `pnpm build` + `pnpm ui:build` succeed
-- [x] 8 skill stubs created with valid `SKILL.md` frontmatter
-- [x] Config template with 3-tier model routing
-- [x] `VAULT_SETUP.md` + `BLOCKED_ITEMS.md` created
-- [x] Validation: secrets, frontmatter, paths all clean
-- [x] `openclaw onboard --install-daemon` completed via the supported non-interactive flow
+- [x] `openclaw onboard --install-daemon` completed via non-interactive flow
 - [x] `openclaw gateway status` succeeds
 - [x] `openclaw health` succeeds
-- [x] Control UI renders at `http://127.0.0.1:18789/` and screenshot evidence was captured
-
-**6C.0 entry verified (2026-03-08):**
-- [x] Control UI authenticated (Health: OK, tokenized URL flow confirmed)
-- [x] First agent chat: model `anthropic/claude-opus-4-6`, session `64a8f306-71f0-4dc1-bba3-7f9144764ee4`
-- [x] Gateway log: `isError=false`, `durationMs=4514`
-
-**Residual item (resolved):**
-- [x] Control UI token auth confirmed working via tokenized dashboard URL
+- [x] Control UI renders at `http://127.0.0.1:18789/` with screenshot evidence
+- [x] `openclaw.json` created with secure defaults (loopback, token auth)
+- [x] 8 skill stubs created with valid `SKILL.md` frontmatter
+- [x] Config template with 3-tier model routing
+- [x] No secrets committed to repo
+- [x] `docs/ai/STATE.md` updated with Phase 1 evidence
+- [x] First agent chat: model `anthropic/claude-opus-4-6`, session confirmed
+- [x] Control UI token auth confirmed via tokenized dashboard URL
 
 ---
 

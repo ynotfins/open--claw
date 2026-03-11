@@ -35,6 +35,10 @@ Developer-local (optional):
 - `docs/ai/PLAN.md` — active plan with phases and exit criteria
 - `docs/ai/ARCHIVE.md` — compressed decisions and knowledge from past sessions
 
+## Excluded directories
+
+- `docs/ai/archive/` — superseded docs. **Never consulted** by PLAN. Historical reference only.
+
 ## Memory
 
 - `docs/ai/memory/MEMORY_CONTRACT.md` — policy for what gets persisted

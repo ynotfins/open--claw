@@ -21,6 +21,10 @@ MCP tool usage is enforced via `.cursor/rules/05-global-mcp-usage.md`.
 Tools are used for: code navigation, documentation lookup, reasoning, browser automation, web extraction, repo operations, and persistent memory.
 Configuration lives outside the repo. Rules enforce behavior, not plumbing.
 
+## Excluded directories
+
+- `docs/ai/archive/` — superseded docs. **Never consulted** by PLAN. Historical reference only.
+
 ## Agent contract
 
 AGENT must:

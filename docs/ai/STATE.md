@@ -1957,3 +1957,16 @@ Molty auto-starts from system tray. If not, launch from Start Menu or `%LOCALAPP
 2. Remove stale old Node.js node registration
 3. Test canvas, screen capture capabilities
 4. Continue Phase 2 exit criteria
+
+## 2026-03-11 05:00 — Docs Accuracy and Archive Phase 0 (mirror)
+
+Full entry in `AI-Project-Manager/docs/ai/STATE.md`.
+
+**Summary**: Created `docs/ai/archive/` in both repos with README. Added "never consulted" rule to `10-project-workflow.md`, `AGENTS.md`, `CURSOR_WORKFLOW.md` in both repos. Moved ephemeral files to archive. Archived and refreshed HANDOFF.md to 2026-03-11 state. Fixed duplicate Phase 1 blocks in open--claw PLAN.md.
+
+**Verdict**: READY — all governance docs updated.
+
+### What's Next
+1. Continue Phase 2 exit criteria
+2. Agent naming via WhatsApp
+3. Gmail OAuth + MXRoute email setup
