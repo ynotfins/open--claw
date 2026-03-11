@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "self-improving-agent": {
+      "version": "3.0.0",
+      "installedAt": 1773096318189
+    },
+    "openai-whisper": {
+      "version": "1.0.0",
+      "installedAt": 1773096319903
+    },
+    "humanize-ai-text": {
+      "version": "1.0.1",
+      "installedAt": 1773096322019
+    },
+    "youtube-watcher": {
+      "version": "1.0.0",
+      "installedAt": 1773096323178
+    },
+    "imap-smtp-email": {
+      "version": "0.0.9",
+      "installedAt": 1773096335163
+    },
+    "proactive-agent-skill": {
+      "version": "1.0.0",
+      "installedAt": 1773096335182
+    },
+    "api-gateway-zito": {
+      "version": "1.0.0",
+      "installedAt": 1773096336503
+    },
+    "web-search-exa": {
+      "version": "1.0.1",
+      "installedAt": 1773096337655
+    },
+    "playwright-mcp": {
+      "version": "1.0.0",
+      "installedAt": 1773096338770
+    },
+    "superdesign": {
+      "version": "1.0.0",
+      "installedAt": 1773096340112
+    }
+  }
+}
