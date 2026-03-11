@@ -24,14 +24,16 @@ GIT_EMAIL="tony@openclaw.ai"
 ## 🚨 Current Issues & Status
 
 ### ❌ BLOCKERS
-1. **Rate Limit Issues**: Multiple exec command denials
-   - Commands affected: setx JAVA_HOME, java -version, PowerShell
-   - Need: Find correct OpenClaw approval limit increase command
+1. **🚨 CRITICAL: Windows Node Disconnected**
+   - Root cause discovered: Windows Desktop node paired but not connected
+   - Impact: ALL exec commands failing (not rate limits!)
+   - Node ID: 891178e980ebe57e373035ebbfc10162d228f649b46aeda07b1ff8696492f112
+   - **Fix needed**: Reconnect Windows companion app
    
 2. **Build Environment**: Missing tools for APK build
-   - pnpm command not found
-   - PowerShell command not recognized
-   - Need: Proper environment setup
+   - pnpm command not found (may resolve after node reconnection)
+   - PowerShell commands ready to work once connected
+   - Allowlist prepared: windows-node-allowlist.json
 
 ### ⚠️ IN PROGRESS  
 - Best practices audit against OpenClaw documentation

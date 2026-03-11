@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "defaults": {
+    "security": "allowlist",
+    "ask": "on-miss", 
+    "askFallback": "allowlist",
+    "autoAllowSkills": true
+  },
+  "agents": {
+    "main": {
+      "security": "allowlist",
+      "ask": "off",
+      "askFallback": "allowlist",
+      "autoAllowSkills": true,
+      "allowlist": [
+        {
+          "pattern": "C:\\Program Files\\Eclipse Adoptium\\jdk-*\\bin\\java.exe",
+          "id": "java-runtime"
+        },
+        {
+          "pattern": "C:\\Program Files\\PowerShell\\*\\pwsh.exe", 
+          "id": "powershell-7"
+        },
+        {
+          "pattern": "C:\\Windows\\System32\\setx.exe",
+          "id": "setx-env"
+        },
+        {
+          "pattern": "C:\\Windows\\System32\\WindowsPowerShell\\*\\powershell.exe",
+          "id": "powershell-legacy"
+        }
+      ]
+    }
+  }
+}
