@@ -1766,3 +1766,119 @@ Full entry in `AI-Project-Manager/docs/ai/STATE.md`.
 2. Gmail OAuth setup (`gog`)
 3. MXRoute email integration (`imap-smtp-email`)
 4. Close remaining Phase 6C exit criteria
+
+---
+
+## 2026-03-10 22:40 — Vendor Clone Pin: v2026.3.8
+
+### Goal
+Replace the untagged shallow vendor clone (commit b228c06, 2026-02-18) with a shallow clone pinned to the latest stable release v2026.3.8 on both Windows NTFS and WSL, then verify gateway stability at the new version.
+
+### Scope
+- `open--claw/vendor/openclaw/` (replaced, gitignored)
+- `~/openclaw-build/` (WSL, replaced and rebuilt)
+- `open--claw/VENDOR_PIN.md` (created, tracked)
+- `open--claw/docs/ai/STATE.md` (this entry)
+- `AI-Project-Manager/docs/ai/STATE.md` (mirror entry)
+- `AI-Project-Manager/docs/ai/memory/DECISIONS.md` (decision logged)
+
+### Commands / Tool Calls
+- `git status --short --branch` (AI-Project-Manager) — verify clean main
+- `git status --short --branch` (open--claw) — verify clean master
+- `wsl bash -lc 'curl -s http://localhost:18792/'` — gateway API health
+- `wsl bash -lc 'pnpm openclaw health'` — gateway health check
+- `openmemory.health-check` — MCP health
+- `Context7.resolve-library-id` (openclaw) — MCP health
+- `github.get_file_contents` (AGENTS.md) — MCP health
+- `wsl bash -lc 'pnpm openclaw skills list'` — pre-upgrade snapshot (19/58 ready)
+- `wsl bash -lc 'cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.pre-v2026.3.8'` — config backup
+- `wsl bash -lc 'pnpm openclaw gateway status'` — pre-upgrade status
+- `git -C vendor\openclaw ls-remote --tags origin v2026.3.8` — verify tag exists (3caab92)
+- `Move-Item vendor\openclaw vendor\openclaw.bak` — backup NTFS clone
+- `git clone --depth=1 --branch v2026.3.8 ... vendor\openclaw` — fresh NTFS clone (8060 files)
+- `git -C vendor\openclaw log --oneline -1` — verify HEAD
+- `git -C vendor\openclaw rev-parse --is-shallow-repository` — verify shallow
+- `Test-Path apps\android\build.gradle.kts` — verify Android app
+- `Test-Path apps\shared\OpenClawKit\Package.swift` — verify shared kit
+- `Get-Content package.json | Select-String version` — verify 2026.3.8
+- `wsl bash -lc 'pnpm openclaw gateway stop'` — stop gateway
+- `wsl bash -lc 'mv ~/openclaw-build ~/openclaw-build.bak'` — backup WSL copy
+- `wsl bash -lc 'git clone --depth=1 --branch v2026.3.8 ... ~/openclaw-build'` — fresh WSL clone
+- `wsl bash -lc 'pnpm install'` — install deps (1263 packages, 16s)
+- `wsl bash -lc 'pnpm build'` — TypeScript build
+- `wsl bash -lc 'pnpm ui:build'` — Vite UI build
+- `wsl bash -lc 'cat package.json | grep version'` — verify 2026.3.8
+- `wsl bash -lc 'systemctl --user restart openclaw-gateway.service'` — restart gateway
+- `wsl bash -lc 'pnpm openclaw health'` — post-upgrade health
+- `wsl bash -lc 'curl -s http://localhost:18792/'` — post-upgrade API
+- `wsl bash -lc 'pnpm openclaw gateway status'` — post-upgrade status
+- `wsl bash -lc 'pnpm openclaw skills list'` — post-upgrade skills (19/59 ready)
+
+### Changes
+- `vendor/openclaw/` — replaced with shallow clone at v2026.3.8 (tag SHA 3caab92, 8060 files)
+- `~/openclaw-build/` — replaced with shallow clone at v2026.3.8, rebuilt (pnpm install + build + ui:build)
+- `open--claw/VENDOR_PIN.md` — created (vendor pin metadata, clone command, upgrade/rollback procedures)
+- Gateway restarted and verified at new version
+
+### Evidence
+| Check | Result | Detail |
+|-------|--------|--------|
+| AI-PM git status | PASS | main, clean |
+| open--claw git status | PASS | master, clean |
+| Gateway API pre-upgrade | PASS | curl :18792 → OK |
+| Gateway health pre-upgrade | PASS | Agents: main (default) |
+| Context7 MCP | PASS | Resolved openclaw library |
+| github MCP | PASS | get_file_contents returned AGENTS.md |
+| openmemory MCP | PASS | healthy, 7 tools |
+| Pre-upgrade skills | PASS | 19/58 ready |
+| Config backup | PASS | .pre-v2026.3.8 created |
+| Tag v2026.3.8 exists | PASS | SHA 3caab92 |
+| NTFS clone backup | PASS | Move-Item -Force |
+| NTFS fresh clone | PASS | 8060 files |
+| NTFS HEAD commit | PASS | 3caab92 |
+| NTFS shallow | PASS | true |
+| Android app present | PASS | build.gradle.kts exists |
+| Shared kit present | PASS | Package.swift exists |
+| NTFS version | PASS | 2026.3.8 |
+| Gateway stopped | PASS | systemd service stopped |
+| WSL backup | PASS | ~/openclaw-build.bak |
+| WSL fresh clone | PASS | Detached HEAD 3caab92 |
+| pnpm install | PASS | 1263 packages, 16s |
+| pnpm build | PASS | tsdown + plugin SDK |
+| pnpm ui:build | PASS | Vite built in 909ms |
+| WSL version | PASS | 2026.3.8 |
+| Gateway restart | PASS | systemctl restart |
+| Health post-upgrade | PASS | Agents: main (default) |
+| API post-upgrade | PASS | curl → OK |
+| Gateway status post-upgrade | PASS | Runtime: running (pid 247862), RPC probe: ok |
+| Skills post-upgrade | PASS | 19/59 ready (gained 1 from upstream, no regressions) |
+
+### Verdict
+READY — vendor clone pinned to v2026.3.8 on both copies, gateway verified stable.
+
+### Blockers
+None
+
+### Fallbacks Used
+- `Rename-Item` and `cmd /c rename` both failed on vendor clone due to broken pnpm symlinks in node_modules. Fallback: `Remove-Item` on node_modules first, then `Move-Item -Force`. PASS.
+- Interactive `pnpm openclaw onboard --install-daemon` blocked at security prompt. Fallback: `systemctl --user restart openclaw-gateway.service`. PASS.
+
+### Cross-Repo Impact
+- AI-Project-Manager: STATE.md mirror entry appended, DECISIONS.md updated with vendor pin decision.
+
+### Decisions Captured
+- **Vendor pin: v2026.3.8 shallow clone** — untagged commit b228c06 was 3 weeks stale and post-dated CVE-2026-26327 fix. Shallow clone at tagged stable release provides deterministic, up-to-date vendor state. Documented in `VENDOR_PIN.md`.
+- **Upgrade procedure formalized** — `VENDOR_PIN.md` documents the exact steps for future upgrades (both Windows NTFS and WSL copies).
+
+### Pending Actions
+- Remove backup directories after 24-hour verification period:
+  - `Remove-Item -Recurse -Force D:\github\open--claw\vendor\openclaw.bak`
+  - `wsl bash -lc 'rm -rf ~/openclaw-build.bak'`
+
+### What Remains Unverified
+- 24-hour gateway stability at v2026.3.8 (will be confirmed by continued normal usage).
+- WhatsApp channel behavior at new version (pre-existing: linked but not yet agent-named).
+
+### What's Next
+1. Remove backup directories after 24-hour verification
+2. Continue Phase 2 exit criteria: agent naming, Gmail OAuth, email integration
