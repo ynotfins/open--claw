@@ -1970,3 +1970,81 @@ Full entry in `AI-Project-Manager/docs/ai/STATE.md`.
 1. Continue Phase 2 exit criteria
 2. Agent naming via WhatsApp
 3. Gmail OAuth + MXRoute email setup
+
+---
+## 2026-03-11 — Fix: Telegram security + Signal disable + Molty removal
+
+### Goal
+Restore WhatsApp responsiveness and harden config after agent's Telegram setup caused gateway saturation.
+
+### Scope
+- ~/.openclaw/openclaw.json (WSL, not in git)
+- ~/.openclaw/devices/paired.json (via openclaw devices remove)
+- open--claw/docs/ai/STATE.md
+- AI-Project-Manager/docs/ai/STATE.md (mirror)
+- C:\Users\ynotf\.openclaw\start-cursor-with-secrets.ps1 (node host launch disabled)
+
+### Commands / Tool Calls
+- `pnpm openclaw health` — PASS (WhatsApp linked, Telegram ok, Signal failed)
+- `pnpm openclaw nodes status` — Known: 1, Paired: 1, Connected: 0 (Windows Desktop)
+- Python atomic write to ~/.openclaw/openclaw.json (3 changes)
+- `cat openclaw.json | python3 -m json.tool` — JSON VALID
+- `pnpm openclaw health` (post-edit) — Signal absent, Telegram ok, WhatsApp linked
+- `pnpm openclaw devices remove 891178e9...6492f112` — Removed (x2: once before node reconnected, once after)
+- `Stop-Process -Id 26472, 22036 -Force` — killed both node host processes
+- `pnpm openclaw nodes status` — Known: 0, Paired: 0, Connected: 0
+- `pnpm openclaw health` (final) — all criteria met
+- start-cursor-with-secrets.ps1: node host launch block commented out
+
+### Changes
+- channels.telegram.dmPolicy: open → allowlist
+- channels.telegram.allowFrom: ["*"] → ["6873660400"]
+- channels.signal.enabled: true → false
+- plugins.entries.signal.enabled: true → false
+- gateway.nodes.allowCommands: removed (gateway.nodes now {})
+- devices remove: 891178e9...6492f112 (Windows Desktop, stale) — removed twice
+- Molty: stopped (Stop-Process); node host PIDs 26472 + 22036 killed
+- start-cursor-with-secrets.ps1: node host auto-launch disabled (commented out)
+
+### Evidence
+| Check | Result |
+|---|---|
+| BLOCK 0 health | PASS — WhatsApp linked, Telegram ok, Signal failed |
+| BLOCK 0 nodes | PASS — Known:1, Paired:1, Connected:0 |
+| BLOCK 1 JSON VALID | PASS |
+| BLOCK 1 changes verified | PASS — all 3 changes confirmed via python read-back |
+| BLOCK 1 post-edit health | PASS — Signal absent, Telegram ok, WhatsApp linked |
+| BLOCK 2 devices remove | PASS — Removed confirmed |
+| BLOCK 3 Molty stopped | PASS — Option C applied; node host processes killed |
+| BLOCK 4 health | PASS — WhatsApp linked, Telegram ok (@Sparky4bot), Signal absent |
+| BLOCK 4 nodes | PASS — Known:0, Paired:0, Connected:0 |
+
+### Verdict
+PASS — all blocks complete, all criteria met.
+
+### Blockers
+None. Signal doctor warning (groupPolicy/allowlist) is cosmetic — Signal is disabled.
+
+### Fallbacks Used
+Shell tool used for all WSL commands (MCP shell-mcp not available in this context).
+Node host processes killed via Stop-Process (Molty force-stop) since tray exit was not available.
+
+### Cross-Repo Impact
+Mirror entry appended to AI-Project-Manager/docs/ai/STATE.md.
+
+### Decisions Captured
+- Molty removed: decision to run gateway without a Windows node host until re-paired
+- Signal disabled: signal-cli requires Java; channel was never operational
+- Telegram locked to owner ID 6873660400 (dmPolicy: allowlist)
+- Node host auto-launch disabled in start-cursor-with-secrets.ps1
+
+### Pending Actions
+- If Windows node capabilities (system.run, canvas, screen) are needed in future: re-install node host and re-pair
+- Signal groupPolicy warning: can be cleaned up by removing signal channel config entirely or setting groupPolicy to "open"
+
+### What Remains Unverified
+Signal doctor warning (cosmetic only — channel is disabled).
+
+### What's Next
+1. Continue Phase 6C exit criteria: approval gate test, first integration
+2. Agent naming via WhatsApp bootstrap conversation

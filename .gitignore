@@ -4,6 +4,8 @@
 .env.local
 *.pem
 *.key
+client_secret_*.json
+*client_secret*.json
 
 # MCP config (lives outside repo)
 mcp.json
