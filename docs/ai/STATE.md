@@ -1,6 +1,39 @@
 # Execution State — Open Claw
 
-Bootstrapped; nothing executed yet.
+`docs/ai/STATE.md` is the **primary operational source of truth** for PLAN in the open--claw repo.
+PLAN reads this before reasoning about blockers, fallbacks, next actions, and cross-repo effects.
+
+---
+
+## Current State Summary
+
+> Last updated: 2026-03-14
+> Last verified runtime: 2026-03-11
+> Mirror source: AI-Project-Manager/docs/ai/STATE.md
+
+### Phase Status (Open Claw)
+| Phase | Status | Closed |
+|-------|--------|--------|
+| Phase 1 — Gateway Boot + First Agent Chat | COMPLETE | 2026-03-08 |
+| **Phase 2 — First Live Integration** | **OPEN** | — |
+
+### Phase 2 Exit Criteria (mirrors AI-PM Phase 6C)
+- [x] Audit log captures actions
+- [x] Hybrid model routing configured
+- [x] WhatsApp channel operational
+- [x] Telegram secured, Signal disabled
+- [x] exec-policy.json deployed (4 require-approval rules)
+- [x] gog OAuth complete (Gmail read access verified)
+- [ ] **First integration connected and tested** (weather skill)
+- [ ] **Approval gate tested for simulated high-risk action**
+
+### Runtime Snapshot (as of 2026-03-11)
+- Gateway: 127.0.0.1:18789, systemd managed, Node v22.22.0, pnpm 10.23.0
+- Skills: 18/58 ready; Channels: WhatsApp (linked), Telegram (secured), Signal (disabled)
+- Windows nodes: 0 connected (Molty removed)
+
+### Archived Entries
+Historical entries are archived in AI-Project-Manager/docs/ai/archive/. This file retains full history for open--claw-specific evidence.
 
 ---
 
