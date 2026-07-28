@@ -33,8 +33,11 @@ PLAN reads this before reasoning about blockers, fallbacks, next actions, and cr
 - **Active runtime**: OpenClaw `2026.6.10` through system Node `v24.16.0`.
 - **Package-manager ownership**: Program Files Node owns Node/npm/npx/Corepack; Corepack shims own pnpm/pnpx; pnpm-global owns ClawHub `0.22.0` and migrated MCP shims.
 - **Lossless Claw**: enabled, activated, loaded, version `0.13.1`, required LCM tools present.
-- **npm-global OpenClaw cleanup**: retained. `.openclaw\gateway.cmd` and the registered `OpenClaw Gateway` task still reference the missing npm-global runtime.
-- **Next gate**: backup-first migration of the gateway scheduled-task/service contract before npm-global residue removal or launcher PATH cutover.
+- **Gateway owner**: `OpenClaw Gateway` scheduled task -> `.openclaw\gateway.cmd` -> system Node -> `D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js`.
+- **ClawX gateway posture**: optional UI/fallback with `gatewayAutoStart=false`; verified not to retake port `18789`.
+- **npm-global OpenClaw cleanup**: complete after backup and dependency-gate proof; no residue remains.
+- **Control-plane verifier**: `38 PASS`, `0 WARN`, `0 FAIL`.
+- **Next gate**: preserve the accepted gateway rollback while evaluating the source-controlled launcher/PATH cutover independently.
 
 ### Authority Reality
 
@@ -91,7 +94,6 @@ PLAN reads this before reasoning about blockers, fallbacks, next actions, and cr
 | Curated runtime not live-proven | HIGH | Run `open-claw/employees/deployed-curated/start-employees.ps1`, approve device pairings, run smoke tests |
 | Foundation checkpoint is not yet fully auto-lossless-proven | HIGH | OpenClaw bridge seam, durable memory retrieval, quarantine checks, new-chat recovery, and power-loss-safe recovery passed; live AI-PM `afterFileEdit` hook delivery remains unproven, so use `python .cursor/hooks/rotate_ledger.py --force` for ledger compaction when needed |
 | `docs/ai/context/AGENT_EXECUTION_LEDGER.md` exceeds the preferred active size | LOW | Preserve as non-canonical evidence; compact/archive only in a dedicated ledger-maintenance pass to avoid mixing historical-record surgery into control-plane stabilization |
-| Windows gateway scheduled task points to missing npm-global OpenClaw payload | HIGH | Back up `.openclaw\gateway.cmd` and the scheduled task, migrate the service command to the approved runtime in a separately authorized live-state phase, prove restart/rollback, then remove npm-global residue |
 
 ### Cross-Repo Dependencies Still Active
 
@@ -2820,3 +2822,123 @@ No changes were made to:
 ### What's Next
 
 Run a backup-first gateway scheduled-task/service migration phase, then re-run the cleanup gate and require npm-global residue absence before considering a launcher PATH cutover.
+
+---
+
+## 2026-07-28 19:30 — OpenClaw Gateway Runtime Ownership Stabilization
+
+### Goal
+
+Move the Windows OpenClaw Gateway service away from broken npm-global OpenClaw and onto the approved `D:\openclaw` runtime, preserve rollback, prove lifecycle/health, and remove the stale npm-global artifacts only after the cleanup gate passed.
+
+### Scope
+
+- Durable control-plane scripts and docs under `D:\github\open--claw`.
+- Live gateway launcher `C:\Users\ynotf\.openclaw\gateway.cmd`.
+- Registered scheduled task `OpenClaw Gateway`.
+- ClawX setting `C:\Users\ynotf\AppData\Roaming\clawx\settings.json`.
+- Exact stale npm-global OpenClaw artifacts under `C:\Users\ynotf\AppData\Roaming\npm`.
+- External backups under `C:\Users\ynotf\openclaw-control-plane-backups`.
+- `D:\openclaw` was inspected and executed but not modified.
+- `C:\Program Files\ClawX` and `vendor\openclaw` were read-only.
+
+### Commands / Tool Calls
+
+- `mcp__codex_apps__agentcore_gateway._agentcore_proj_de6018ea9fcf({"path":"D:\\github\\open--claw"})`
+- `mcp__codex_apps__agentcore_gateway._agentcore_proj_b2eae6d407f9({})`
+- `mcp__codex_apps__agentcore_gateway._sequential_thi_0fff49d23dd0(...)`
+- `git status --short`
+- `git branch --show-current`
+- `git log -6 --oneline`
+- `Get-ScheduledTask -TaskName 'OpenClaw Gateway'`
+- `Get-ScheduledTaskInfo -TaskName 'OpenClaw Gateway'`
+- `Export-ScheduledTask -TaskName 'OpenClaw Gateway'`
+- `openclaw gateway --help`
+- `openclaw gateway install --help`
+- `openclaw gateway status`
+- `openclaw gateway health --json`
+- `openclaw --version`
+- `openclaw config validate`
+- `rg` inspection of installed OpenClaw 2026.6.10 daemon/service source
+- `rg -a` inspection of the ClawX `gatewayAutoStart` contract in `app.asar`
+- `netstat.exe -ano -p tcp`
+- `Get-CimInstance Win32_Process`
+- `.\scripts\openclaw\backup-openclaw-gateway-service.ps1`
+- `.\scripts\openclaw\backup-openclaw-gateway-service.ps1 -Execute`
+- `& '<gateway-backup>\restore-openclaw-gateway-service.ps1'`
+- `.\scripts\openclaw\migrate-openclaw-gateway-service.ps1 -BackupPath '<gateway-backup>'`
+- `.\scripts\openclaw\migrate-openclaw-gateway-service.ps1 -BackupPath '<gateway-backup>' -Execute`
+- `.\scripts\openclaw\migrate-openclaw-gateway-service.ps1 -BackupPath '<gateway-backup>' -ResumeAfterInstall -Execute`
+- `.\scripts\openclaw\disable-clawx-embedded-gateway-autostart.ps1 -BackupPath '<gateway-backup>'`
+- `.\scripts\openclaw\disable-clawx-embedded-gateway-autostart.ps1 -BackupPath '<gateway-backup>' -Execute`
+- `Start-Process -FilePath 'C:\Program Files\ClawX\ClawX.exe'`
+- `.\scripts\openclaw\backup-openclaw-control-plane-state.ps1 -Execute`
+- `.\scripts\openclaw\cleanup-broken-npm-global-openclaw.ps1 -BackupPath '<cleanup-backup>'`
+- `.\scripts\openclaw\cleanup-broken-npm-global-openclaw.ps1 -Execute -BackupPath '<cleanup-backup>'`
+- `.\scripts\openclaw\verify-openclaw-control-plane.ps1 -RequireNpmGlobalOpenClawAbsent`
+- PowerShell parser checks through `System.Management.Automation.Language.Parser`.
+
+### Changes
+
+- Added backup, migration, and ClawX gateway-conflict scripts.
+- Expanded the audit and verifier with scheduled-task, service-command, listener-owner, gateway-health, ClawX auto-start, and npm-residue gates.
+- Reinstalled the Windows gateway service through OpenClaw 2026.6.10 using system Node and the `D:\openclaw` service entry.
+- Changed only ClawX `gatewayAutoStart` from `true` to `false` after exact backup.
+- Removed only the four gated stale npm-global OpenClaw artifacts.
+- Added the migration audit and updated the blueprint, recovery runbook, restart operation, cleanup-gate resolution, HANDOFF, and this state record.
+
+### Evidence
+
+- PASS — gateway backup `C:\Users\ynotf\openclaw-control-plane-backups\gateway-service\20260728-190702` contains hash-verified task XML, gateway script, config, runtime contract, and rollback scripts.
+- PASS — gateway/task/config rollback dry run exited `0`.
+- PASS — ClawX settings backup and rollback dry run exited `0`.
+- PASS — `openclaw.json` hash was unchanged by the service reinstall.
+- PASS — gateway command is system Node -> `D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js`.
+- PASS — gateway stop, start, forced restart, listener ownership, and `health ok=true`.
+- PASS — ClawX relaunched and did not retake port `18789`.
+- PASS — cleanup backup `C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-191721` contains the exact removed artifacts and restore script.
+- PASS — cleanup dry run proved no approved launcher or safe-scope live-state dependency.
+- PASS — exact four-artifact npm-global cleanup completed.
+- PASS — active `openclaw` remains `D:\openclaw\bin`; version `2026.6.10`.
+- PASS — config validation, Lossless Claw `0.13.1`, ClawHub `0.22.0`, pnpm ownership, and migrated MCP command ownership.
+- PASS — final verifier returned `38 PASS`, `0 WARN`, `0 FAIL`.
+- PASS — Sparky file-change review gate accepted the scope, architecture, rollback, simplicity, and product alignment.
+- FAIL — AgentCore Serena project routing and Sequential Thinking returned MCP tunnel HTTP `404`; fallback evidence is recorded below.
+
+### Verdict
+
+READY — gateway ownership is stabilized on the approved runtime, rollback is preserved and dry-run-proven, stale npm-global OpenClaw is removed, and the full control-plane verifier is green.
+
+### Blockers
+
+- AgentCore's Serena/Sequential MCP tunnel remained unavailable with HTTP `404`. This did not block live acceptance because the exact installed source and direct runtime evidence were sufficient.
+
+### Fallbacks Used
+
+- Serena fallback: targeted `rg`, PowerShell file inspection, installed-source line reads, and Git diff review.
+- Sequential Thinking fallback: explicit fail-closed decision gates embedded in the source-controlled scripts and requirement-by-requirement evidence review.
+
+### Cross-Repo Impact
+
+None. No AI-Project-Manager or droidrun file was changed. Recovery-bundle refresh was deferred because this phase's durable authority and evidence are fully contained in `open--claw` plus external backups.
+
+### Decisions Captured
+
+- Windows gateway service entrypoint is `dist\index.js`; interactive CLI entrypoint is `openclaw.mjs`.
+- `netstat.exe -ano -p tcp` plus `Win32_Process` is the authoritative listener-owner check on this host.
+- ClawX stays optional UI/fallback and must keep `gatewayAutoStart=false` while the scheduled task owns port `18789`.
+- `D:\openclaw` remains operational runtime authority; no launcher/PATH cutover was combined with this phase.
+
+### Pending Actions
+
+- Investigate the AgentCore MCP tunnel `404` independently.
+- Evaluate source-controlled launcher/PATH cutover in a separate rollback-ready phase.
+
+### What Remains Unverified
+
+- Rollback execution was intentionally not performed because it would restore the broken pre-migration service; rollback artifact integrity and dry-run behavior are proven.
+- A future ClawX upgrade may reset `gatewayAutoStart`; the verifier will fail if that occurs.
+
+### What's Next
+
+Preserve the current gateway/task/ClawX/npm backups and treat launcher/PATH cutover as the next independent control-plane phase.

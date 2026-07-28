@@ -1,6 +1,6 @@
 # OpenClaw / ClawX Control-Plane Blueprint
 
-Status: durable control-plane baseline implemented; active launcher cutover staged; npm-global cleanup retained
+Status: durable control-plane baseline implemented; gateway ownership stabilized; npm-global cleanup complete; active launcher cutover staged
 Baseline date: 2026-07-28
 Machine: CHAOSCENTRAL
 Control-plane repository: `D:\github\open--claw`
@@ -85,6 +85,7 @@ ClawX is:
 - an installer-managed OpenClaw bundle;
 - a fallback CLI path after the active operational launcher;
 - a recovery option when `D:\openclaw\bin` is unavailable.
+- configured with `gatewayAutoStart=false` so it does not compete with the authoritative Windows gateway task.
 
 ClawX is not:
 
@@ -231,7 +232,7 @@ No CrewClaw command, package install, worker start, or agent bulk-copy is author
 
 ## Broken npm-global OpenClaw Policy
 
-The npm-global OpenClaw entry is stale and broken, but cleanup remains gated.
+The npm-global OpenClaw entry was stale and broken. Its dependency gate was resolved on 2026-07-28.
 
 At the 2026-07-28 gate:
 
@@ -241,7 +242,21 @@ At the 2026-07-28 gate:
 - `C:\Users\ynotf\.openclaw\gateway.cmd` still referenced the npm-global package's missing `dist\index.js`;
 - the registered `OpenClaw Gateway` scheduled task executed that live-state launcher and had last result `1`.
 
-Therefore cleanup is retained, not executed. Removing the residue is not authorized until the live gateway service contract is migrated or explicitly retired in a backup-first `.openclaw` change phase.
+The gateway service was reinstalled through the approved `D:\openclaw` runtime, ClawX embedded gateway auto-start was disabled, lifecycle and health passed, and the safe-scope dependency scan returned no npm-global reference. The four stale npm-global artifacts were then removed from the exact timestamped backup set.
+
+Current gateway chain:
+
+```text
+OpenClaw Gateway scheduled task
+  -> C:\Users\ynotf\.openclaw\gateway.cmd
+  -> C:\Program Files\nodejs\node.exe
+  -> D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js
+  -> gateway --port 18789
+```
+
+The interactive CLI continues to use `openclaw.mjs`; the Windows service uses `dist\index.js`. Both belong to the approved `D:\openclaw` runtime package.
+
+See `docs/audits/2026-07-28-openclaw-gateway-ownership-migration.md`.
 
 ## Rollback Model
 

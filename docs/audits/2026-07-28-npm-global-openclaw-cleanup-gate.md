@@ -4,6 +4,8 @@ Date: 2026-07-28
 Decision: retained; cleanup not executed
 Scope: read-only go/no-go proof for the broken npm-global OpenClaw artifacts
 
+Resolution note: this historical gate was satisfied later on 2026-07-28. The gateway service moved to the approved `D:\openclaw` runtime, lifecycle and listener ownership passed, and the four stale npm-global artifacts were removed from a fresh exact backup. See `docs/audits/2026-07-28-openclaw-gateway-ownership-migration.md`.
+
 Timestamped control-plane backup created:
 
 `C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-031416`

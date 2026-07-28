@@ -1,11 +1,28 @@
-# OpenClaw gateway — canonical restart (mirror)
+# OpenClaw Gateway — Windows Canonical Restart
 
-Canonical copy lives in **AI-Project-Manager**: `docs/ai/operations/openclaw-gateway-restart.md`.
+Current machine authority is the Windows scheduled task installed from `D:\openclaw`. The older WSL/systemd restart note is not the authority for this runtime.
 
-This file exists so the **open--claw** workspace has the same operational guidance without duplicating maintenance burden.
+## Restart
 
-**Summary**
+```powershell
+openclaw gateway restart --safe --wait 30s
+openclaw gateway status
+openclaw gateway health --json
+```
 
-- Restart path: `AI-Project-Manager\scripts\restart-openclaw-gateway.ps1`
-- Launcher: `$HOME\.openclaw\start-cursor-with-secrets.ps1` (via `bws run`)
-- Align `~/openclaw-build` with gateway tag **v2026.3.13-1**; systemd uses `dist/index.js` from that tree.
+Use `--force` only when the safe restart cannot drain active work.
+
+## Required Owner
+
+```text
+OpenClaw Gateway scheduled task
+  -> C:\Users\ynotf\.openclaw\gateway.cmd
+  -> C:\Program Files\nodejs\node.exe
+  -> D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js
+```
+
+Confirm the port owner with `netstat.exe -ano -p tcp`, then inspect the listener PID through `Get-CimInstance Win32_Process`.
+
+Full recovery, backup, and rollback instructions:
+
+`docs/runbooks/OPENCLAW_CLAWX_RECOVERY.md`

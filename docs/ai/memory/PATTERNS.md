@@ -91,3 +91,26 @@ Get-ChildItem -Path "candidate_employees" -Recurse -Filter "*.md" | ForEach-Obje
 ```
 **Example:** `open-claw/AI_Employee_knowledgebase/candidate_employees/**` (2,608 files); `droidrun/src/droidrun/tools/ios/`
 **Caveats:** Banner must appear on the very first line for embeddings/routing to detect it reliably. The promotion gate in `NON_ROUTABLE_QUARANTINE.md` must be followed before removing banners and activating any previously quarantined file.
+
+---
+
+## Windows OpenClaw Gateway Cutover Pattern
+
+**Context:** Moving a Windows gateway scheduled task between OpenClaw runtime owners without losing rollback or accepting the wrong listener.
+
+**Pattern:**
+
+1. Export the scheduled-task XML and back up `gateway.cmd`, `openclaw.json`, and the runtime contract outside Git.
+2. Generate a dry-run-default restore script and prove its hashes/preflight before mutation.
+3. Reinstall through the approved active CLI with `gateway install --force --runtime node`.
+4. Verify `openclaw.json` did not change unexpectedly.
+5. Prove the generated command uses system Node plus the approved runtime's `dist\index.js`.
+6. Resolve any port competitor before lifecycle testing; for ClawX, back up settings and keep `gatewayAutoStart=false`.
+7. Prove stop, start, restart, listener PID/command line, and gateway health.
+8. Relaunch optional UI surfaces and prove they do not retake the port.
+9. Run the stale-runtime cleanup gate in dry-run mode, take a fresh exact-artifact backup, then delete only enumerated artifacts.
+10. Run the complete verifier with stale-runtime absence required.
+
+**Example:** `scripts/openclaw/backup-openclaw-gateway-service.ps1`, `migrate-openclaw-gateway-service.ps1`, and `disable-clawx-embedded-gateway-autostart.ps1`.
+
+**Caveats:** The CLI entrypoint (`openclaw.mjs`) and service entrypoint (`dist\index.js`) are intentionally different. Endpoint health without listener-process ownership is insufficient.

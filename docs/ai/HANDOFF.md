@@ -1,7 +1,7 @@
 # Agent Handoff — Open Claw
 
-**Date**: 2026-04-13
-**Status**: Curated runtime status unchanged; this file remains an optional operator snapshot only.
+**Date**: 2026-07-28
+**Status**: Windows gateway ownership stabilized; this file remains an optional operator snapshot only.
 **Recovery note**: Follow `D:/github/AI-Project-Manager/docs/ai/operations/NO_LOSS_RECOVERY_LOOP.md` for the canonical no-loss order. `HANDOFF.md` is optional and never required for recovery.
 
 Previous handoff snapshot archived at `docs/ai/archive/handoff-2026-03-08.md`.
@@ -15,14 +15,19 @@ Previous handoff snapshot archived at `docs/ai/archive/handoff-2026-03-08.md`.
 - Active `openclaw` ownership remains `D:\openclaw\bin`; no PATH cutover occurred.
 - System Node owns Node/npm/npx/Corepack; Corepack owns pnpm; pnpm-global owns ClawHub `0.22.0` and migrated MCP shims.
 - Lossless Claw `0.13.1` remains loaded and activated.
-- npm-global OpenClaw cleanup was not executed. `C:\Users\ynotf\.openclaw\gateway.cmd` and the registered `OpenClaw Gateway` task still reference the missing npm-global runtime.
-- Next safe phase: back up and migrate the gateway service contract to the approved runtime, prove restart/rollback, then re-run cleanup and launcher-cutover gates.
+- The `OpenClaw Gateway` task now uses system Node plus `D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js`.
+- Gateway stop, start, forced restart, listener ownership, and health passed.
+- ClawX remains available, with `gatewayAutoStart=false` so its embedded gateway does not compete for port `18789`.
+- The four stale npm-global OpenClaw artifacts were removed after the dependency gate passed.
+- Final control-plane verifier: `38 PASS`, `0 WARN`, `0 FAIL`.
+- Next safe phase: keep `D:\openclaw` as operational authority and evaluate source-controlled launcher/PATH cutover independently.
 
 Current operating references:
 
 - `docs/blueprints/OPENCLAW_CLAWX_CONTROL_PLANE_BLUEPRINT.md`
 - `docs/runbooks/OPENCLAW_CLAWX_RECOVERY.md`
 - `docs/audits/2026-07-28-npm-global-openclaw-cleanup-gate.md`
+- `docs/audits/2026-07-28-openclaw-gateway-ownership-migration.md`
 
 ---
 

@@ -177,11 +177,97 @@ Do not copy or restore the plugin's live database or npm project from this repos
 .\scripts\openclaw\verify-openclaw-control-plane.ps1
 ```
 
-After a future npm-global cleanup, require residue absence:
+Require npm-global OpenClaw residue absence:
 
 ```powershell
 .\scripts\openclaw\verify-openclaw-control-plane.ps1 -RequireNpmGlobalOpenClawAbsent
 ```
+
+The accepted 2026-07-28 baseline is `38 PASS`, `0 WARN`, `0 FAIL`.
+
+## 9. Verify Gateway Ownership
+
+```powershell
+openclaw gateway status
+openclaw gateway health --json
+Get-ScheduledTask -TaskName 'OpenClaw Gateway'
+Get-ScheduledTaskInfo -TaskName 'OpenClaw Gateway'
+```
+
+Required chain:
+
+```text
+OpenClaw Gateway scheduled task
+  -> C:\Users\ynotf\.openclaw\gateway.cmd
+  -> C:\Program Files\nodejs\node.exe
+  -> D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js
+  -> gateway --port 18789
+```
+
+Confirm listener ownership with the host-proven method:
+
+```powershell
+netstat.exe -ano -p tcp | Select-String ':18789'
+Get-CimInstance Win32_Process -Filter 'ProcessId=<listener-pid>'
+```
+
+`Get-NetTCPConnection` produced false negatives during the accepted migration and is not sufficient by itself on this host.
+
+Verify ClawX does not compete for the gateway:
+
+```powershell
+$settings = Get-Content -LiteralPath 'C:\Users\ynotf\AppData\Roaming\clawx\settings.json' -Raw |
+    ConvertFrom-Json -Depth 100
+$settings.gatewayAutoStart
+```
+
+Expected: `False`.
+
+## 10. Gateway Backup, Migration, and Rollback
+
+Durable scripts:
+
+```powershell
+.\scripts\openclaw\backup-openclaw-gateway-service.ps1
+.\scripts\openclaw\migrate-openclaw-gateway-service.ps1 -BackupPath '<gateway-backup>'
+.\scripts\openclaw\disable-clawx-embedded-gateway-autostart.ps1 -BackupPath '<gateway-backup>'
+```
+
+All are dry-run by default. Do not execute a migration without a fresh timestamped backup and passing rollback dry run.
+
+Accepted backup:
+
+`C:\Users\ynotf\openclaw-control-plane-backups\gateway-service\20260728-190702`
+
+Gateway/task/config rollback:
+
+```powershell
+& 'C:\Users\ynotf\openclaw-control-plane-backups\gateway-service\20260728-190702\restore-openclaw-gateway-service.ps1'
+```
+
+ClawX setting rollback:
+
+```powershell
+& 'C:\Users\ynotf\openclaw-control-plane-backups\gateway-service\20260728-190702\clawx-app-data\restore-clawx-gateway-settings.ps1'
+```
+
+Run either without `-Execute` first. The original gateway rollback restores the historical broken npm-global service reference, so use it only as an emergency state restoration while the npm-global artifact backup is also available.
+
+## 11. npm-global OpenClaw Cleanup Recovery
+
+The stale npm-global artifacts were removed after the dependency gate passed.
+
+Accepted cleanup backup:
+
+`C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-191721`
+
+Dry-run restore:
+
+```powershell
+& 'C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-191721\restore-npm-global-openclaw.ps1'
+```
+
+Only restore these artifacts if an explicit rollback requires reconstructing the pre-migration state.
 
 ## Restore PATH from Backup
 

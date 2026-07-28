@@ -103,3 +103,21 @@ Record key decisions with rationale. One entry per decision.
 **Decision:** `open-claw/AI_Employee_knowledgebase/NON_ROUTABLE_QUARANTINE.md` is the canonical source of truth for all quarantine status decisions and promotions.
 **Alternatives considered:** Embedding quarantine status in individual rule files.
 **Rationale:** Single canonical registry with a promotion gate prevents conflicting enforcement across the 5 layers and provides an audit trail.
+
+---
+
+## 2026-07-28 — Windows Gateway Ownership Uses the Operational Runtime, Not ClawX or npm-global
+
+**Context:** The registered Windows gateway task still referenced broken npm-global OpenClaw, while ClawX could independently auto-start an embedded gateway on the same port.
+**Decision:** The authoritative Windows gateway chain is the `OpenClaw Gateway` scheduled task using system Node plus `D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js`. ClawX remains optional UI/fallback with `gatewayAutoStart=false`. The interactive CLI remains `D:\openclaw\bin` and uses `openclaw.mjs`.
+**Alternatives considered:** Keep broken npm-global service ownership; let ClawX own the gateway; point the task at the ClawX bundle; combine the change with a PATH launcher cutover.
+**Rationale:** This preserves the locked authority model, removes the stale dependency, keeps installer-managed ClawX read-only, and separates service stabilization from a future launcher/PATH decision.
+
+---
+
+## 2026-07-28 — Listener Ownership Requires Process Proof
+
+**Context:** `Get-NetTCPConnection` returned false negatives while `netstat` showed a live listener, and a successful gateway health probe initially reached ClawX rather than the scheduled-task runtime.
+**Decision:** Gateway acceptance requires `netstat.exe -ano -p tcp` plus `Win32_Process` proof that port `18789` belongs to system Node executing the approved `D:\openclaw` service entry.
+**Alternatives considered:** Treat task state or `gateway health` alone as sufficient; continue using `Get-NetTCPConnection` alone.
+**Rationale:** Task registration and endpoint health do not prove runtime ownership. PID/command-line proof prevents a healthy but unauthorized fallback process from satisfying acceptance.
