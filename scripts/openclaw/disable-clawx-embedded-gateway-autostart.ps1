@@ -114,7 +114,7 @@ if (-not (Test-Path -LiteralPath $settingsBackup -PathType Leaf)) {
 if ((Get-FileHash -LiteralPath $settingsBackup -Algorithm SHA256).Hash -ne [string]$evidence.SettingsSHA256Before) {
     throw 'ClawX settings backup hash mismatch.'
 }
-if (Get-Process -Name ClawX -ErrorAction SilentlyContinue) {
+if ($Execute -and (Get-Process -Name ClawX -ErrorAction SilentlyContinue)) {
     throw 'Close ClawX before restoring its settings.'
 }
 Write-Host "Restore source: $settingsBackup"
