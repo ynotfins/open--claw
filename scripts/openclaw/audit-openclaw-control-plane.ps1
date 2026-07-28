@@ -59,8 +59,13 @@ $activeCmd = Join-Path $OperationalRoot 'bin\openclaw.cmd'
 $activePs1 = Join-Path $OperationalRoot 'bin\openclaw.ps1'
 $activeWrapper = Join-Path $OperationalRoot 'scripts\Invoke-ClawXOpenClaw.ps1'
 $activeEntry = Join-Path $OperationalRoot 'runtime\openclaw\node_modules\openclaw\openclaw.mjs'
+$activeServiceEntry = Join-Path $OperationalRoot 'runtime\openclaw\node_modules\openclaw\dist\index.js'
 $clawXCmd = Join-Path $ClawXRoot 'resources\cli\openclaw.cmd'
 $clawXEntry = Join-Path $ClawXRoot 'resources\openclaw\openclaw.mjs'
+$clawXSettings = Join-Path $env:APPDATA 'clawx\settings.json'
+$gatewayScript = Join-Path $LiveStateRoot 'gateway.cmd'
+$gatewayTaskName = 'OpenClaw Gateway'
+$gatewayPort = 18789
 $npmPrefix = (& npm prefix -g).Trim()
 $npmRoot = (& npm root -g).Trim()
 $pnpmRoot = (& pnpm root -g).Trim()
@@ -111,10 +116,51 @@ Write-Section 'OpenClaw launcher chain'
     [pscustomobject]@{ Artifact = 'Active PowerShell shim'; Path = $activePs1; Exists = Test-Path -LiteralPath $activePs1 }
     [pscustomobject]@{ Artifact = 'Active wrapper'; Path = $activeWrapper; Exists = Test-Path -LiteralPath $activeWrapper }
     [pscustomobject]@{ Artifact = 'Approved runtime entry'; Path = $activeEntry; Exists = Test-Path -LiteralPath $activeEntry }
+    [pscustomobject]@{ Artifact = 'Approved service entry'; Path = $activeServiceEntry; Exists = Test-Path -LiteralPath $activeServiceEntry }
     [pscustomobject]@{ Artifact = 'System Node'; Path = $systemNode; Exists = Test-Path -LiteralPath $systemNode }
     [pscustomobject]@{ Artifact = 'ClawX fallback cmd'; Path = $clawXCmd; Exists = Test-Path -LiteralPath $clawXCmd }
     [pscustomobject]@{ Artifact = 'ClawX bundled entry'; Path = $clawXEntry; Exists = Test-Path -LiteralPath $clawXEntry }
 ) | Format-Table -AutoSize
+
+Write-Section 'Gateway ownership'
+$gatewayTask = Get-ScheduledTask -TaskName $gatewayTaskName -ErrorAction SilentlyContinue
+$gatewayInfo = if ($null -ne $gatewayTask) {
+    Get-ScheduledTaskInfo -TaskName $gatewayTaskName -ErrorAction SilentlyContinue
+}
+$gatewayAction = if ($null -ne $gatewayTask) {
+    @($gatewayTask.Actions)[0]
+}
+$gatewayText = if (Test-Path -LiteralPath $gatewayScript -PathType Leaf) {
+    Get-Content -LiteralPath $gatewayScript -Raw
+}
+$listenerLine = @(& netstat.exe -ano -p tcp |
+    Select-String -Pattern "^\s*TCP\s+\S+:$gatewayPort\s+\S+\s+LISTENING\s+(\d+)\s*$" |
+    Select-Object -First 1)
+$listenerProcess = $null
+if ($listenerLine.Count -gt 0 -and $listenerLine[0].Line -match "^\s*TCP\s+\S+:$gatewayPort\s+\S+\s+LISTENING\s+(\d+)\s*$") {
+    $listenerProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$Matches[1])" -ErrorAction SilentlyContinue
+}
+$clawXGatewayAutoStart = $null
+if (Test-Path -LiteralPath $clawXSettings -PathType Leaf) {
+    $clawXGatewayAutoStart = [bool](
+        (Get-Content -LiteralPath $clawXSettings -Raw | ConvertFrom-Json -Depth 100).gatewayAutoStart
+    )
+}
+[pscustomobject]@{
+    TaskRegistered = $null -ne $gatewayTask
+    TaskState = if ($null -ne $gatewayTask) { [string]$gatewayTask.State } else { '<missing>' }
+    TaskLastResult = if ($null -ne $gatewayInfo) { $gatewayInfo.LastTaskResult } else { $null }
+    TaskAction = if ($null -ne $gatewayAction) { [string]$gatewayAction.Execute } else { '<missing>' }
+    GatewayScriptReferencesNpmGlobal = [bool]($gatewayText -like "*$npmPrefix*")
+    GatewayScriptReferencesOperationalService = [bool]($gatewayText -like "*$activeServiceEntry*")
+    ListenerPid = if ($null -ne $listenerProcess) { $listenerProcess.ProcessId } else { $null }
+    ListenerExecutable = if ($null -ne $listenerProcess) { $listenerProcess.ExecutablePath } else { '<missing>' }
+    ListenerUsesOperationalService = [bool](
+        $null -ne $listenerProcess -and
+        [string]$listenerProcess.CommandLine -like "*$activeServiceEntry*"
+    )
+    ClawXGatewayAutoStart = $clawXGatewayAutoStart
+} | Format-List
 
 Write-Section 'npm-global OpenClaw residue'
 $npmArtifacts = @(

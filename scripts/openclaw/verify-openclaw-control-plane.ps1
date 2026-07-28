@@ -52,6 +52,23 @@ function Invoke-Captured {
     }
 }
 
+function Get-ListeningProcessByPort {
+    param([Parameter(Mandatory)][int]$Port)
+
+    $matches = @(& netstat.exe -ano -p tcp |
+        Select-String -Pattern "^\s*TCP\s+\S+:$Port\s+\S+\s+LISTENING\s+(\d+)\s*$")
+    foreach ($match in $matches) {
+        if ($match.Line -notmatch "^\s*TCP\s+\S+:$Port\s+\S+\s+LISTENING\s+(\d+)\s*$") {
+            continue
+        }
+        $process = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$Matches[1])" -ErrorAction SilentlyContinue
+        if ($null -ne $process) {
+            return $process
+        }
+    }
+    return $null
+}
+
 function Test-Owner {
     param(
         [Parameter(Mandatory)][string]$Command,
@@ -79,7 +96,12 @@ $npmPrefix = (& npm prefix -g).Trim()
 $npmRoot = (& npm root -g).Trim()
 $operationalRoot = 'D:\openclaw'
 $activeCmd = Join-Path $operationalRoot 'bin\openclaw.cmd'
+$activeServiceEntry = Join-Path $operationalRoot 'runtime\openclaw\node_modules\openclaw\dist\index.js'
 $clawXCmd = 'C:\Program Files\ClawX\resources\cli\openclaw.cmd'
+$gatewayScript = Join-Path $env:USERPROFILE '.openclaw\gateway.cmd'
+$gatewayTaskName = 'OpenClaw Gateway'
+$gatewayPort = 18789
+$clawXSettings = Join-Path $env:APPDATA 'clawx\settings.json'
 
 $requiredOrder = @(
     (Join-Path $operationalRoot 'bin'),
@@ -212,6 +234,78 @@ if ($pluginHealthy) {
 }
 else {
     Add-Result -Check 'Lossless Claw runtime' -Status FAIL -Evidence "exit=$($pluginInspect.ExitCode); one or more required runtime fields missing"
+}
+
+$gatewayTask = Get-ScheduledTask -TaskName $gatewayTaskName -ErrorAction SilentlyContinue
+if ($null -eq $gatewayTask) {
+    Add-Result -Check 'Gateway scheduled task' -Status FAIL -Evidence "$gatewayTaskName is not registered"
+}
+else {
+    $gatewayAction = @($gatewayTask.Actions)[0]
+    if (
+        $null -ne $gatewayAction -and
+        ([string]$gatewayAction.Execute).Equals($gatewayScript, [StringComparison]::OrdinalIgnoreCase)
+    ) {
+        Add-Result -Check 'Gateway scheduled task' -Status PASS -Evidence "$gatewayTaskName -> $gatewayScript"
+    }
+    else {
+        Add-Result -Check 'Gateway scheduled task' -Status FAIL -Evidence "Unexpected action: $([string]$gatewayAction.Execute)"
+    }
+}
+
+if (Test-Path -LiteralPath $gatewayScript -PathType Leaf) {
+    $gatewayScriptText = Get-Content -LiteralPath $gatewayScript -Raw
+    $gatewayContractHealthy = (
+        $gatewayScriptText -notlike "*$npmPrefix*" -and
+        $gatewayScriptText -like "*$systemNodeRoot\node.exe*" -and
+        $gatewayScriptText -like "*$activeServiceEntry*"
+    )
+    if ($gatewayContractHealthy) {
+        Add-Result -Check 'Gateway service command' -Status PASS -Evidence "$systemNodeRoot\node.exe -> $activeServiceEntry"
+    }
+    else {
+        Add-Result -Check 'Gateway service command' -Status FAIL -Evidence 'Gateway task script has an unexpected runtime owner or retains npm-global OpenClaw'
+    }
+}
+else {
+    Add-Result -Check 'Gateway service command' -Status FAIL -Evidence "Missing: $gatewayScript"
+}
+
+$gatewayListener = Get-ListeningProcessByPort -Port $gatewayPort
+if (
+    $null -ne $gatewayListener -and
+    ([string]$gatewayListener.ExecutablePath).Equals(
+        (Join-Path $systemNodeRoot 'node.exe'),
+        [StringComparison]::OrdinalIgnoreCase
+    ) -and
+    [string]$gatewayListener.CommandLine -like "*$activeServiceEntry*" -and
+    [string]$gatewayListener.CommandLine -notlike "*$npmPrefix*"
+) {
+    Add-Result -Check 'Gateway listener owner' -Status PASS -Evidence "pid=$($gatewayListener.ProcessId); $($gatewayListener.ExecutablePath) -> $activeServiceEntry"
+}
+else {
+    Add-Result -Check 'Gateway listener owner' -Status FAIL -Evidence "Port $gatewayPort is not owned by the approved D:\openclaw service runtime"
+}
+
+$gatewayHealth = Invoke-Captured -Command { & openclaw gateway health --json }
+if ($gatewayHealth.ExitCode -eq 0 -and $gatewayHealth.Text -match '"ok"\s*:\s*true') {
+    Add-Result -Check 'Gateway health' -Status PASS -Evidence 'openclaw gateway health --json returned ok=true'
+}
+else {
+    Add-Result -Check 'Gateway health' -Status FAIL -Evidence "exit=$($gatewayHealth.ExitCode)"
+}
+
+if (Test-Path -LiteralPath $clawXSettings -PathType Leaf) {
+    $clawXSettingsObject = Get-Content -LiteralPath $clawXSettings -Raw | ConvertFrom-Json -Depth 100
+    if (-not [bool]$clawXSettingsObject.gatewayAutoStart) {
+        Add-Result -Check 'ClawX embedded gateway auto-start' -Status PASS -Evidence 'gatewayAutoStart=false'
+    }
+    else {
+        Add-Result -Check 'ClawX embedded gateway auto-start' -Status FAIL -Evidence 'gatewayAutoStart=true can compete for port 18789'
+    }
+}
+else {
+    Add-Result -Check 'ClawX embedded gateway auto-start' -Status FAIL -Evidence "Missing: $clawXSettings"
 }
 
 $npmArtifacts = @(
