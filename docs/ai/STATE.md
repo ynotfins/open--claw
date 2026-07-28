@@ -10,7 +10,7 @@ PLAN reads this before reasoning about blockers, fallbacks, next actions, and cr
 
 ## Current State Summary
 
-> Last updated: 2026-04-15 (foundation checkpoint lock mirror)
+> Last updated: 2026-07-28 (OpenClaw / ClawX control-plane stabilization)
 > Archive pass: 2026-04-01 — 1,170 → 175 lines (archive/compaction pass, this session)
 > Previous archive: `docs/ai/archive/state-log-full-history-2026-02-18-to-2026-03-21.md`
 
@@ -21,6 +21,20 @@ PLAN reads this before reasoning about blockers, fallbacks, next actions, and cr
 - **OpenClaw status at this checkpoint**: the OpenClaw -> OpenMemory bridge seam is live, durable retrieval passed, new-chat recovery passed, power-loss-safe recovery passed, and quarantine-safe retrieval passed.
 - **Overall system status**: operationally ready / lossless-ready, but not fully auto-lossless-proven because live AI-PM Cursor `afterFileEdit` hook delivery remains unproven.
 - **Canonical ledger fallback**: when AI-PM ledger compaction is needed after an append, run `python .cursor/hooks/rotate_ledger.py --force`.
+
+### 2026-07-28 Windows Control-Plane Baseline
+
+- **Runtime/control authority**: OpenClaw.
+- **Current operational authority**: `D:\openclaw`.
+- **Durable control-plane authority**: `D:\github\open--claw` for sanitized docs, runbooks, audits, scripts, and launcher source.
+- **Live runtime state**: `C:\Users\ynotf\.openclaw`; never a bulk source-control target.
+- **ClawX role**: optional desktop UI and installer-managed fallback, not control authority.
+- **Active CLI owner**: `D:\openclaw\bin\openclaw.cmd` / `openclaw.ps1`.
+- **Active runtime**: OpenClaw `2026.6.10` through system Node `v24.16.0`.
+- **Package-manager ownership**: Program Files Node owns Node/npm/npx/Corepack; Corepack shims own pnpm/pnpx; pnpm-global owns ClawHub `0.22.0` and migrated MCP shims.
+- **Lossless Claw**: enabled, activated, loaded, version `0.13.1`, required LCM tools present.
+- **npm-global OpenClaw cleanup**: retained. `.openclaw\gateway.cmd` and the registered `OpenClaw Gateway` task still reference the missing npm-global runtime.
+- **Next gate**: backup-first migration of the gateway scheduled-task/service contract before npm-global residue removal or launcher PATH cutover.
 
 ### Authority Reality
 
@@ -76,7 +90,8 @@ PLAN reads this before reasoning about blockers, fallbacks, next actions, and cr
 | Active-bot alias normalization (non-Sparky) not yet packet-aligned | LOW | Canonical active-bot map is generated (see `open-claw/AI_Employee_knowledgebase/current_employees.md`); packet-level identifiers may still contain legacy alias wording |
 | Curated runtime not live-proven | HIGH | Run `open-claw/employees/deployed-curated/start-employees.ps1`, approve device pairings, run smoke tests |
 | Foundation checkpoint is not yet fully auto-lossless-proven | HIGH | OpenClaw bridge seam, durable memory retrieval, quarantine checks, new-chat recovery, and power-loss-safe recovery passed; live AI-PM `afterFileEdit` hook delivery remains unproven, so use `python .cursor/hooks/rotate_ledger.py --force` for ledger compaction when needed |
-| `docs/ai/context/AGENT_EXECUTION_LEDGER.md` does not exist | LOW | Create when first open--claw AGENT block appends a ledger entry |
+| `docs/ai/context/AGENT_EXECUTION_LEDGER.md` exceeds the preferred active size | LOW | Preserve as non-canonical evidence; compact/archive only in a dedicated ledger-maintenance pass to avoid mixing historical-record surgery into control-plane stabilization |
+| Windows gateway scheduled task points to missing npm-global OpenClaw payload | HIGH | Back up `.openclaw\gateway.cmd` and the scheduled task, migrate the service command to the approved runtime in a separately authorized live-state phase, prove restart/rollback, then remove npm-global residue |
 
 ### Cross-Repo Dependencies Still Active
 
@@ -2756,3 +2771,52 @@ PARTIAL - the OpenClaw bridge seam itself is live and proven through durable mem
 ### What's Next
 
 Keep the next pass focused on the AI-PM ledger-hook path, not on reopening the OpenClaw bridge files.
+
+---
+
+## 2026-07-28 — OpenClaw / ClawX Control-Plane Stabilization
+
+### Goal
+
+Materialize the durable OpenClaw/ClawX control-plane architecture, recovery documentation, package-manager policy, CrewClaw discovery policy, verification/backup/cleanup tooling, and a non-invasive source-controlled launcher prototype.
+
+### Changes
+
+- Added the final control-plane blueprint and recovery runbook.
+- Added package-manager and CrewClaw discovery policies.
+- Added audit, verification, backup, cleanup-gate, and launcher scripts under `scripts/openclaw`.
+- Added target-owned `openclaw-control` launcher wrappers without changing PATH.
+- Updated active ClawHub documentation to invoke the pnpm-owned `clawhub` command directly.
+- Added a current-authority note to the historical CLI audit and an execution note to the migration map.
+- Added a cleanup-gate audit and retained npm-global OpenClaw.
+
+### Evidence
+
+- PASS — system Node, npm, Corepack, pnpm, pnpm global root/bin, ClawHub, OpenClaw, ClawX, config validation, and Lossless Claw runtime checks.
+- PASS — repository verifier completed with `32 PASS`, `1 WARN`, `0 FAIL`; the warning is the intentionally retained npm-global OpenClaw residue.
+- PASS — all new PowerShell scripts parsed with zero errors.
+- PASS — audit, verifier, backup dry run, backup execution, restore dry run, and launcher prototype checks.
+- PASS — timestamped backup created at `C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-031416`.
+- BLOCKED AS DESIGNED — cleanup dry run found `.openclaw\gateway.cmd` still references npm-global OpenClaw.
+- PASS — scoped secret scan found no matches.
+- PASS — `git diff --check`.
+
+### Verdict
+
+PARTIAL ACCEPTANCE — the durable source-controlled control-plane baseline is implemented and verified. Active execution remains safely pinned to `D:\openclaw`. npm-global cleanup and launcher cutover remain gated on a separately authorized gateway-service migration.
+
+### Protected Surfaces
+
+No changes were made to:
+
+- `D:\openclaw`;
+- `C:\Users\ynotf\.openclaw`;
+- `C:\Users\ynotf\AppData\Roaming\clawx`;
+- `C:\Program Files\ClawX`;
+- `D:\github\open--claw\vendor\openclaw`;
+- User or Machine PATH;
+- package installations.
+
+### What's Next
+
+Run a backup-first gateway scheduled-task/service migration phase, then re-run the cleanup gate and require npm-global residue absence before considering a launcher PATH cutover.

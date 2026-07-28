@@ -28,16 +28,16 @@ pnpm openclaw skills info <name>     # Detailed info for one skill
 ### ClawHub CLI
 
 ```bash
-npx clawhub search <query>           # Vector search for skills
-npx clawhub inspect <slug>           # Fetch metadata without installing
-npx clawhub install <slug>           # Install into skills/<slug>/
-npx clawhub install <slug> --force   # Overwrite existing
-npx clawhub update [slug]            # Update installed skills
-npx clawhub uninstall <slug>         # Remove a skill
-npx clawhub list                     # List installed skills (from lockfile)
-npx clawhub explore                  # Browse latest updated skills
-npx clawhub whoami                   # Check auth status
-npx clawhub login                    # Authenticate (opens browser)
+clawhub search <query>           # Vector search for skills
+clawhub inspect <slug>           # Fetch metadata without installing
+clawhub install <slug>           # Install into skills/<slug>/
+clawhub install <slug> --force   # Overwrite existing
+clawhub update [slug]            # Update installed skills
+clawhub uninstall <slug>         # Remove a skill
+clawhub list                     # List installed skills (from lockfile)
+clawhub explore                  # Browse latest updated skills
+clawhub whoami                   # Check auth status
+clawhub login                    # Authenticate (opens browser)
 ```
 
 ### After installing or removing skills
@@ -91,10 +91,10 @@ Skills that need external credentials to function:
 
 ## Security Notes
 
-- ClawHub skills are community-contributed; inspect before installing (`npx clawhub inspect`)
+- ClawHub skills are community-contributed; inspect before installing (`clawhub inspect`)
 - Skills run within the gateway process with the same permissions
 - Review `SKILL.md` for each installed skill to understand what tools it exposes
-- Uninstall any skill that requests unexpected permissions: `npx clawhub uninstall <slug>`
+- Uninstall any skill that requests unexpected permissions: `clawhub uninstall <slug>`
 
 ### BLOCKED: Credential-proxying skills (gateway.maton.ai)
 

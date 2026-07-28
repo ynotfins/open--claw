@@ -8,6 +8,24 @@ Previous handoff snapshot archived at `docs/ai/archive/handoff-2026-03-08.md`.
 
 ---
 
+## 2026-07-28 Control-Plane Update
+
+- OpenClaw is runtime/control authority; ClawX is optional desktop UI/fallback.
+- `D:\github\open--claw` now carries the durable blueprint, recovery/package-manager runbooks, CrewClaw discovery plan, verification/backup/cleanup scripts, and a non-invasive launcher prototype.
+- Active `openclaw` ownership remains `D:\openclaw\bin`; no PATH cutover occurred.
+- System Node owns Node/npm/npx/Corepack; Corepack owns pnpm; pnpm-global owns ClawHub `0.22.0` and migrated MCP shims.
+- Lossless Claw `0.13.1` remains loaded and activated.
+- npm-global OpenClaw cleanup was not executed. `C:\Users\ynotf\.openclaw\gateway.cmd` and the registered `OpenClaw Gateway` task still reference the missing npm-global runtime.
+- Next safe phase: back up and migrate the gateway service contract to the approved runtime, prove restart/rollback, then re-run cleanup and launcher-cutover gates.
+
+Current operating references:
+
+- `docs/blueprints/OPENCLAW_CLAWX_CONTROL_PLANE_BLUEPRINT.md`
+- `docs/runbooks/OPENCLAW_CLAWX_RECOVERY.md`
+- `docs/audits/2026-07-28-npm-global-openclaw-cleanup-gate.md`
+
+---
+
 ## 1. Project Role
 
 `open--claw` is the **strict enforcement center** of the tri-workspace. The supreme product charter — `open-claw/AI_Employee_knowledgebase/FINAL_OUTPUT_PRODUCT.md` — lives here. No agent, prompt, rule, or doc in any repo may override it.
