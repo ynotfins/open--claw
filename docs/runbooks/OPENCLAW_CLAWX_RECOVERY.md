@@ -1,7 +1,7 @@
 # OpenClaw / ClawX Recovery Runbook
 
-Baseline date: 2026-07-28  
-Scope: CHAOSCENTRAL Windows control plane  
+Baseline date: 2026-07-28
+Scope: CHAOSCENTRAL Windows control plane
 Default posture: inspect first; no automatic runtime repair
 
 ## Recovery Invariants

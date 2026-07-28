@@ -1,8 +1,8 @@
 # OpenClaw / ClawX Control-Plane Blueprint
 
-Status: durable control-plane baseline implemented; active launcher cutover staged; npm-global cleanup retained  
-Baseline date: 2026-07-28  
-Machine: CHAOSCENTRAL  
+Status: durable control-plane baseline implemented; active launcher cutover staged; npm-global cleanup retained
+Baseline date: 2026-07-28
+Machine: CHAOSCENTRAL
 Control-plane repository: `D:\github\open--claw`
 
 This blueprint governs machine-level OpenClaw and ClawX operations. It is subordinate to the repository's supreme product charter, `open-claw/AI_Employee_knowledgebase/FINAL_OUTPUT_PRODUCT.md`; it does not amend product law or the curated employee standard.

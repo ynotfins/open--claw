@@ -1,7 +1,7 @@
 # npm-global OpenClaw Cleanup Gate
 
-Date: 2026-07-28  
-Decision: retained; cleanup not executed  
+Date: 2026-07-28
+Decision: retained; cleanup not executed
 Scope: read-only go/no-go proof for the broken npm-global OpenClaw artifacts
 
 Timestamped control-plane backup created:

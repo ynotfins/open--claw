@@ -1,6 +1,6 @@
 # Package Manager Policy
 
-Baseline date: 2026-07-28  
+Baseline date: 2026-07-28
 Scope: OpenClaw / ClawX control plane on CHAOSCENTRAL
 
 ## Ownership Contract

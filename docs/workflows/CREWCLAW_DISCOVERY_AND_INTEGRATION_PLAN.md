@@ -1,7 +1,7 @@
 # CrewClaw Discovery and Integration Plan
 
-Status: discovery-only  
-Baseline date: 2026-07-28  
+Status: discovery-only
+Baseline date: 2026-07-28
 No CrewClaw install, command, worker start, or configuration mutation is authorized by this plan.
 
 ## Purpose
