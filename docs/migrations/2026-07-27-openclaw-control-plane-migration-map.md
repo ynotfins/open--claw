@@ -1,5 +1,7 @@
 # OpenClaw Control-Plane Migration Map
 
+> Execution note (2026-07-28): durable blueprint, recovery, package-manager, CrewClaw discovery, verification, backup, cleanup-gate, and launcher-prototype artifacts now live in the target repo. Active execution remains `D:\openclaw`; npm-global OpenClaw cleanup is retained because `.openclaw\gateway.cmd` and the registered gateway task still reference the missing npm-global runtime. See `docs/blueprints/OPENCLAW_CLAWX_CONTROL_PLANE_BLUEPRINT.md` and `docs/audits/2026-07-28-npm-global-openclaw-cleanup-gate.md`.
+
 Report date: 2026-07-27
 Current verification refresh: 2026-07-28
 Scope: migration map plus package-manager migration record. This file does not authorize copying, deleting, runtime writes, OpenClaw CLI ownership changes, commits, or pushes.

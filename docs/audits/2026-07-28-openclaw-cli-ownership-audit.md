@@ -1,5 +1,7 @@
 # OpenClaw CLI ownership audit
 
+> Current authority note (2026-07-28): this historical ownership audit predated the final control-plane decision. OpenClaw is the runtime/control authority; ClawX is an optional desktop UI and fallback. Current policy is defined in `docs/blueprints/OPENCLAW_CLAWX_CONTROL_PLANE_BLUEPRINT.md`. The evidence below is preserved as captured.
+
 Date: 2026-07-28
 
 Scope: read-only investigation of OpenClaw command ownership after Node PATH hygiene correction. This audit determines whether npm-global OpenClaw appears actively required, what owns the active `openclaw` command, and what a safe future cleanup plan should look like.
