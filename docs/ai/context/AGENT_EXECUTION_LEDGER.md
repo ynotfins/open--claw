@@ -1097,3 +1097,129 @@ Remaining risks:
 ### Verdict
 
 PASS — the required `open--claw` mirror alignment is complete for the live AI-PM recovery bundle.
+
+---
+
+## Entry: 2026-07-28 - OpenClaw Gateway Runtime Ownership Stabilization
+
+### User Prompt
+
+```text
+Use Serena and Sequential Thinking MCP servers from agentcore-gateway.
+
+Goal:
+Finish the OpenClaw Gateway runtime ownership stabilization.
+
+Critical blocker:
+The cleanup gate found that `.openclaw\gateway.cmd` and the registered OpenClaw Gateway scheduled task still point to broken npm-global OpenClaw `dist\index.js`. npm-global OpenClaw is stale/broken, but it cannot be removed until Gateway ownership is migrated safely.
+
+Final goal:
+Migrate the OpenClaw Gateway scheduled-task/runtime ownership away from broken npm-global OpenClaw and onto the approved working `D:\openclaw` runtime path, with full backup, rollback, verification, documentation, and commits. After Gateway migration is proven, rerun the broken npm-global OpenClaw cleanup gate and remove stale npm-global OpenClaw artifacts only if safe.
+
+Requirements:
+- Back up all affected Gateway/task/runtime files and scheduled-task definitions before mutation.
+- Do not print secrets.
+- Do not push.
+- Do not stage Serena files.
+- Do not modify ClawX installed files.
+- Do not modify vendor OpenClaw.
+- Preserve rollback.
+- Verify the Gateway starts, stops, and reports healthy after migration.
+- Verify `openclaw --version`.
+- Verify `openclaw config validate`.
+- Verify Lossless Claw remains loaded and activated.
+- Verify ClawHub remains pnpm-owned and working.
+- Verify active `openclaw` remains `D:\openclaw\bin` unless a safer source-controlled launcher cutover is proven and documented.
+- Rerun the npm-global OpenClaw cleanup gate after Gateway migration.
+- Remove stale npm-global OpenClaw only if the gate proves it is no longer referenced and rollback is safe.
+- Update control-plane docs/runbooks/audits/scripts as needed.
+- Commit in logical commits.
+- Do not push.
+```
+
+### Final AGENT Response (exact)
+
+Gateway ownership stabilization is complete. The scheduled task is healthy on the approved `D:\openclaw` runtime, ClawX no longer competes for the port, and broken npm-global OpenClaw was safely removed.
+
+| Item | Final evidence |
+| --- | --- |
+| Gateway owner before | `.openclaw\gateway.cmd` -> broken npm-global `openclaw\dist\index.js` |
+| Gateway owner after | `.openclaw\gateway.cmd` -> system Node -> `D:\openclaw\runtime\openclaw\node_modules\openclaw\dist\index.js` |
+| Gateway lifecycle | Stop, start, forced restart, listener ownership, and health passed |
+| ClawX | Relaunched successfully; `gatewayAutoStart=false`; did not retake port `18789` |
+| Active CLI | Unchanged at `D:\openclaw\bin\openclaw.cmd` |
+| npm-global OpenClaw | Four gated stale artifacts removed; no residue remains |
+| Control-plane verifier | `38 PASS`, `0 WARN`, `0 FAIL` |
+| Serena files | Only `.serena/project.yml` and `open-claw/.serena/project.yml` remain uncommitted |
+
+Commits:
+
+- `a14ea94` — `scripts: stabilize OpenClaw Gateway ownership`
+- `6b538de` — `docs: record OpenClaw Gateway ownership migration`
+- `bb806ac` — `fix: keep ClawX rollback dry run non-invasive`
+
+Primary artifacts:
+
+- `scripts/openclaw/backup-openclaw-gateway-service.ps1`
+- `scripts/openclaw/migrate-openclaw-gateway-service.ps1`
+- `scripts/openclaw/disable-clawx-embedded-gateway-autostart.ps1`
+- `scripts/openclaw/verify-openclaw-control-plane.ps1`
+- `docs/audits/2026-07-28-openclaw-gateway-ownership-migration.md`
+- `docs/runbooks/OPENCLAW_CLAWX_RECOVERY.md`
+
+Backups and rollback:
+
+- Gateway/task/config: `C:\Users\ynotf\openclaw-control-plane-backups\gateway-service\20260728-190702`
+- Gateway rollback: `restore-openclaw-gateway-service.ps1`
+- ClawX setting rollback: `clawx-app-data\restore-clawx-gateway-settings.ps1`
+- npm-global cleanup: `C:\Users\ynotf\openclaw-control-plane-backups\control-plane\20260728-191721`
+- npm-global rollback: `restore-npm-global-openclaw.ps1`
+- All three rollback scripts passed fresh dry runs.
+
+No PATH change, package install, ClawX installed-file edit, `D:\openclaw` runtime edit, vendor edit, push, or Serena staging occurred.
+
+Remaining risks:
+
+- AgentCore Serena and Sequential Thinking calls consistently returned MCP tunnel HTTP `404`; installed-source inspection and live evidence provided the documented degraded-mode fallback.
+- A future ClawX upgrade could reset `gatewayAutoStart`; the verifier now fails if it becomes `true`.
+- The gateway intentionally remains tied to the current `D:\openclaw` operational runtime.
+
+Next phase: independently evaluate the source-controlled launcher/PATH cutover while preserving the accepted gateway rollback. Do not combine that phase with runtime relocation.
+
+::git-commit{cwd="D:\github\open--claw"}
+
+<oai-mem-citation>
+<citation_entries>
+MEMORY.md:2691-2704|note=[used prior OpenClaw Windows and gateway context]
+MEMORY.md:2781-2784|note=[used prior listener ownership verification pattern]
+</citation_entries>
+<rollout_ids>
+019ea8eb-3e5f-7661-9e24-204606b2d71f
+</rollout_ids>
+</oai-mem-citation>
+
+### Files Changed
+
+- `docs/ai/context/AGENT_EXECUTION_LEDGER.md`
+- `docs/ai/STATE.md`
+- `docs/ai/HANDOFF.md`
+- `docs/ai/memory/DECISIONS.md`
+- `docs/ai/memory/PATTERNS.md`
+- `docs/ai/operations/openclaw-gateway-restart.md`
+- `docs/audits/2026-07-28-openclaw-gateway-ownership-migration.md`
+- `docs/audits/2026-07-28-npm-global-openclaw-cleanup-gate.md`
+- `docs/blueprints/OPENCLAW_CLAWX_CONTROL_PLANE_BLUEPRINT.md`
+- `docs/runbooks/OPENCLAW_CLAWX_RECOVERY.md`
+- `scripts/openclaw/audit-openclaw-control-plane.ps1`
+- `scripts/openclaw/verify-openclaw-control-plane.ps1`
+- `scripts/openclaw/backup-openclaw-gateway-service.ps1`
+- `scripts/openclaw/migrate-openclaw-gateway-service.ps1`
+- `scripts/openclaw/disable-clawx-embedded-gateway-autostart.ps1`
+
+### STATE.md Entries Updated
+
+- `docs/ai/STATE.md`: `## 2026-07-28 19:30 — OpenClaw Gateway Runtime Ownership Stabilization`
+
+### Verdict
+
+PASS — the scheduled task, live listener, ClawX coexistence, cleanup, rollback, durable control plane, and final verifier all satisfy the acceptance criteria.
